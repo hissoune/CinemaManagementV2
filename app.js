@@ -14,6 +14,7 @@ const authRoutes = require('./app/routes/authRoute');
 const movieRoutes = require('./app/routes/movieRoutes');
 const roomRoutes = require('./app/routes/roomRoutes');
 const sessionRoutes = require('./app/routes/sessionRoutes');
+const seatRoutes = require('./app/routes/seatRoutes');
 
 
 
@@ -27,6 +28,7 @@ app.use('/api/roomes', roomRoutes);
 
 app.use('/api/sessions', sessionRoutes);
 
+app.use('/api/seats', seatRoutes);
 
 
 const PORT = process.env.PORT || 3000;
