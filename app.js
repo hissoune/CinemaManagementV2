@@ -11,12 +11,15 @@ connectDB();
 
 const userRoutes = require('./app/routes/userRoutes');
 const authRoutes = require('./app/routes/authRoute');
+const movieRoutes = require('./app/routes/movieRoutes');
 
 
 
 app.use('/api', userRoutes); 
 
 app.use('/api', authRoutes); 
+
+app.use('/api/movies', movieRoutes);
 
 
 
