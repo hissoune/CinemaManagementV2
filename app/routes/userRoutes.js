@@ -7,7 +7,6 @@ router.post('/users', createUser);
 
 router.get('/profile', verifyToken, async (req, res) => {
     try {
-      console.log(req.user.id);
       
     const user = await User.findById(req.user.id).select('-password');
     if (!user) {

@@ -9,11 +9,12 @@ const RoomSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  type: {
-    type: String,
-    enum: ['standard', '3D', 'IMAX'], 
-    default:"standard"
-  }
+   creator: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required:true
+  },
+ 
 }, { timestamps: true });
 
 module.exports = mongoose.model('Room', RoomSchema);

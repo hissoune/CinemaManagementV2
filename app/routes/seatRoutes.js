@@ -2,14 +2,18 @@ const express = require('express');
 const router = express.Router();
 const seatController = require('../controllers/seatController');
 
-router.post('/', seatController.createSeat);
+const verifyToken = require('../midlwares/verifyToken');
 
-router.get('/', seatController.getAllSeats);
+const checkRole = require('../midlwares/CheckRole');
 
-router.get('/:id', seatController.getSeatById);
+router.post('/',verifyToken,checkRole(['admin']), seatController.createSeat);
 
-router.put('/seats/:id', seatController.updateSeat);
+router.get('/',verifyToken,checkRole(['admin']), seatController.getAllSeats);
 
-router.delete('/seats/:id', seatController.deleteSeat);
+router.get('/:id',verifyToken,checkRole(['admin']), seatController.getSeatById);
+
+router.put('/seats/:id',verifyToken,checkRole(['admin']), seatController.updateSeat);
+
+router.delete('/seats/:id',verifyToken,checkRole(['admin']), seatController.deleteSeat);
 
 module.exports = router;

@@ -29,9 +29,20 @@ exports.createSession = async (req, res) => {
 };
 
 exports.getAllSessions = async (req, res) => {
-  try {
-    const sessions = await Session.find().populate('movie room');
-    res.status(200).json(sessions);
+   try {
+    const userId = req.user.id; 
+
+    const sessions = await Session.find()
+      .populate('movie') 
+      .populate('room') 
+      .exec();
+
+    const filteredSessions = sessions.filter(session => 
+      session.movie && session.movie.creator.toString() === userId || 
+      session.room && session.room.creator.toString() === userId
+    );
+
+    res.status(200).json(filteredSessions);
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: 'Server error' });

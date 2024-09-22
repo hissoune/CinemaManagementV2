@@ -1,14 +1,21 @@
 const Room = require('../models/Room');
+const User = require('../models/User');
 
 exports.createRoom = async (req, res) => {
   try {
-    const { name, capacity, location,type } = req.body;
+    const userId = req.user.id;
+
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    const { name, capacity, location } = req.body;
 
     const newRoom = new Room({
       name,
       capacity,
       location,
-      type,
+      creator:userId,
     });
 
     await newRoom.save();
@@ -22,7 +29,13 @@ exports.createRoom = async (req, res) => {
 // Get all rooms
 exports.getAllRooms = async (req, res) => {
   try {
-    const rooms = await Room.find();
+     const userId = req.user.id;
+
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    const rooms = await Room.find({creator:userId});
     res.status(200).json(rooms);
   } catch (err) {
     console.error(err);
@@ -33,7 +46,13 @@ exports.getAllRooms = async (req, res) => {
 // Get a single room by ID
 exports.getRoomById = async (req, res) => {
   try {
-    const room = await Room.findById(req.params.id);
+     const userId = req.user.id;
+
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    const room = await Room.findOne({ _id: req.params.id, creator: userId });
     if (!room) {
       return res.status(404).json({ msg: 'Room not found' });
     }
@@ -47,27 +66,41 @@ exports.getRoomById = async (req, res) => {
 // Update a room
 exports.updateRoom = async (req, res) => {
   try {
-    const room = await Room.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const userId = req.user.id; 
+
+    const room = await Room.findOne({ _id: req.params.id, creator: userId });
+
     if (!room) {
-      return res.status(404).json({ msg: 'Room not found' });
+      return res.status(404).json({ msg: 'Room not found or you are not the creator' });
     }
-    res.status(200).json(room);
+
+    const updatedRoom = await Room.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    res.status(200).json(updatedRoom);
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: 'Server error' });
   }
 };
 
+
 // Delete a room
 exports.deleteRoom = async (req, res) => {
   try {
-    const room = await Room.findByIdAndDelete(req.params.id);
+    const userId = req.user.id; 
+
+    const room = await Room.findOne({ _id: req.params.id, creator: userId });
+
     if (!room) {
-      return res.status(404).json({ msg: 'Room not found' });
+      return res.status(404).json({ msg: 'Room not found or you are not the creator' });
     }
+
+    await Room.findByIdAndDelete(req.params.id);
+    
     res.status(200).json({ msg: 'Room deleted successfully' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ msg: 'Server error' });
   }
 };
+
