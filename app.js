@@ -13,6 +13,7 @@ const userRoutes = require('./app/routes/userRoutes');
 const authRoutes = require('./app/routes/authRoute');
 const movieRoutes = require('./app/routes/movieRoutes');
 const roomRoutes = require('./app/routes/roomRoutes');
+const sessionRoutes = require('./app/routes/sessionRoutes');
 
 
 
@@ -23,6 +24,8 @@ app.use('/api', authRoutes);
 app.use('/api/movies', movieRoutes);
 
 app.use('/api/roomes', roomRoutes);
+
+app.use('/api/sessions', sessionRoutes);
 
 
 
