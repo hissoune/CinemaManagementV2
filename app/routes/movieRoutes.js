@@ -5,14 +5,14 @@ const checkRole = require('../midlwares/CheckRole');
 
 const router = express.Router();
 
-router.post('/create', verifyToken, createMovie);
+router.post('/create', verifyToken,checkRole(['admin']), createMovie);
 
-router.get('/', getMovies);
+router.get('/',verifyToken,checkRole(['admin']), getMovies);
 
-router.get('/:id', getMovieById);
+router.get('/:id',verifyToken,checkRole(['admin']), getMovieById);
 
-router.put('/update/:id', verifyToken, updateMovie);
+router.put('/update/:id',verifyToken,checkRole(['admin']), verifyToken, updateMovie);
 
-router.delete('/delete/:id', verifyToken, deleteMovie);
+router.delete('/delete/:id',verifyToken,checkRole(['admin']), verifyToken, deleteMovie);
 
 module.exports = router;

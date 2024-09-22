@@ -1,10 +1,17 @@
 const Movie = require('../models/Movie');
+const User = require('../models/User');
 
-// Create a new movie
 exports.createMovie = async (req, res) => {
   try {
     const { title, description,releaseDate, genre, duration, rating} = req.body;
 
+
+    const userId = req.user.id;
+
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
     if (!title || !description || !genre ||  !rating || !duration) {
       return res.status(400).json({ msg: 'Please provide all required fields' });
     }
@@ -16,6 +23,7 @@ exports.createMovie = async (req, res) => {
       releaseDate,
       duration,
       rating,
+      creator:userId,
     });
 
     const savedMovie = await newMovie.save();

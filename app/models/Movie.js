@@ -12,11 +12,17 @@ const MovieSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  genre: {
-    type: String,
+ genre: {
+    type: [String],  
+    required: true,  
   },
   duration: {
     type: Number, 
+  },
+  creator: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'User',
+    required:true
   },
   rating: {
     type: Number,
