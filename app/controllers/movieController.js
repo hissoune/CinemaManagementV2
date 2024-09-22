@@ -37,7 +37,13 @@ exports.createMovie = async (req, res) => {
 
 exports.getMovies = async (req, res) => {
   try {
-    const movies = await Movie.find();
+    const userId = req.user.id;
+
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    const movies = await Movie.find({creator:userExists._id});
     res.status(200).json(movies);
   } catch (err) {
     console.error(err);
@@ -47,7 +53,13 @@ exports.getMovies = async (req, res) => {
 
 exports.getMovieById = async (req, res) => {
   try {
-    const movie = await Movie.findById(req.params.id);
+     const userId = req.user.id;
+
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    const movie = await Movie.findOne({ _id: req.params.id, creator: userId });
 
     if (!movie) {
       return res.status(404).json({ msg: 'Movie not found' });
@@ -63,9 +75,14 @@ exports.getMovieById = async (req, res) => {
 exports.updateMovie = async (req, res) => {
   try {
      const { title, description,releaseDate, genre, duration, rating} = req.body;
+     
+    const userId = req.user.id;
 
-    // Find the movie by ID and update its details
-    let movie = await Movie.findById(req.params.id);
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    const movie = await Movie.findOne({ _id: req.params.id, creator: userId });
     if (!movie) {
       return res.status(404).json({ msg: 'Movie not found' });
     }
@@ -87,10 +104,15 @@ exports.updateMovie = async (req, res) => {
 
 exports.deleteMovie = async (req, res) => {
   try {
-    const movie = await Movie.findByIdAndDelete(req.params.id);
+    const userId = req.user.id; 
+
+    const movie = await Movie.findOne({ _id: req.params.id, creator: userId });
+
     if (!movie) {
-      return res.status(404).json({ msg: 'Movie not found' });
+      return res.status(404).json({ msg: 'Movie not found or you are not the creator' });
     }
+
+    await Movie.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ msg: 'Movie deleted successfully' });
   } catch (err) {
