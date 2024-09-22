@@ -10,11 +10,13 @@ app.use(express.urlencoded({ extended: true }));
 connectDB();
 
 const userRoutes = require('./app/routes/userRoutes');
+const authRoutes = require('./app/routes/authRoute');
 
 
 
 app.use('/api', userRoutes); 
 
+app.use('/api', authRoutes); 
 
 
 
