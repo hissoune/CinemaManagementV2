@@ -30,8 +30,15 @@ exports.createSeat = async (req, res) => {
 };
 
 exports.getAllSeats = async (req, res) => {
-  try {
-    const seats = await Seat.find().populate('room');
+ try {
+    const userId = req.user.id; 
+
+    const rooms = await Room.find({ creator: userId });
+
+    const roomIds = rooms.map(room => room._id);
+
+    const seats = await Seat.find({ room: { $in: roomIds } }).populate('room');
+
     res.status(200).json(seats);
   } catch (err) {
     console.error(err);
