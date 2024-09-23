@@ -7,7 +7,6 @@ const Blacklist = require('../models/Blacklist');
 const mailer = require('../utils/mailer');
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// Login Service
 exports.login = async (email, password) => {
   const user = await User.findOne({ email });
   if (!user) {
@@ -24,8 +23,11 @@ exports.login = async (email, password) => {
 
   return token;
 };
-
-// Logout Service
+exports.register = async (data) => {
+     const { name, email, password,role } = data;
+         const newUser = new User({ name, email, password ,role});
+    return await newUser.save();
+}
 exports.logout = async (token) => {
   const decoded = jwt.decode(token);
   

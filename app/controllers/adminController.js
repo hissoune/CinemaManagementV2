@@ -1,5 +1,4 @@
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
+const userService = require('../services/adminService');
 
 exports.createUser = async (req, res) => {
     try {
@@ -7,8 +6,7 @@ exports.createUser = async (req, res) => {
       
  const { name, email, password,role } = req.body;
         
-    const newUser = new User({ name, email, password ,role});
-    await newUser.save();
+    const newUser =await userService.createUser( {name, email, password,role })
     res.status(201).json(newUser);
   } catch (err) {
     res.status(400).json({ error: err.message });

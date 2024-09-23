@@ -9,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 
 connectDB();
 
-const userRoutes = require('./app/routes/userRoutes');
+const adminRoutes = require('./app/routes/adminRoutes');
 const authRoutes = require('./app/routes/authRoute');
 const movieRoutes = require('./app/routes/movieRoutes');
 const roomRoutes = require('./app/routes/roomRoutes');
@@ -19,9 +19,9 @@ const reservationRoutes = require('./app/routes/reservationRoutes');
 
 
 
-app.use('/api', userRoutes); 
+app.use('/api', adminRoutes); 
 
-app.use('/api', authRoutes); 
+app.use('/api/auth', authRoutes); 
 
 app.use('/api/movies', movieRoutes);
 
