@@ -1,117 +1,52 @@
-const Reservation = require('../models/Reservation');
-const Session = require('../models/Session');
-const Seat = require('../models/Seate');
-const User = require('../models/User');
+const reservationService = require('../services/reservationService');
 
 exports.createReservation = async (req, res) => {
   try {
-    const { session, seats } = req.body;
-
     const userId = req.user.id;
-
-    const userExists = await User.findById(userId);
-    if (!userExists) {
-      return res.status(404).json({ msg: 'User not found' });
-    }
-
-    const sessionExists = await Session.findById(session);
-    if (!sessionExists) {
-      return res.status(404).json({ msg: 'Session not found' });
-    }
-
-    const seatExists = await Seat.findById(seats);
-    if (!seatExists || !seatExists.availability) {
-      return res.status(404).json({ msg: 'Seat not found or unavailable' });
-    }
-
-    seatExists.availability = false;
-    await seatExists.save();
-
-    const newReservation = new Reservation({
-      user: userId,
-      session,
-      seats,
-    });
-
-    await newReservation.save();
+    const { session, seats } = req.body;
+    const newReservation = await reservationService.createReservation(userId, session, seats);
     res.status(201).json(newReservation);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message });
   }
 };
 
-
 exports.getAllReservations = async (req, res) => {
   try {
-    const reservations = await Reservation.find().populate('user').populate('session').populate('seats');
+    const reservations = await reservationService.getAllReservations();
     res.status(200).json(reservations);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message });
   }
 };
 
 exports.getReservationById = async (req, res) => {
   try {
-    const reservation = await Reservation.findById(req.params.id).populate('user').populate('session').populate('seats');
-    if (!reservation) {
-      return res.status(404).json({ msg: 'Reservation not found' });
-    }
+    const reservationId = req.params.id;
+    const reservation = await reservationService.getReservationById(reservationId);
     res.status(200).json(reservation);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message });
   }
 };
 
 exports.updateReservation = async (req, res) => {
   try {
+    const reservationId = req.params.id;
     const { seats, confirmed } = req.body;
-
-    const seatExists = await Seat.findById(seats);
-    if (!seatExists || !seatExists.availability) {
-      return res.status(404).json({ msg: 'Seat not found or unavailable' });
-    }
-
-    seatExists.availability = false;
-    await seatExists.save();
-
-    const updatedReservation = await Reservation.findByIdAndUpdate(
-      req.params.id,
-      { seats, confirmed },
-      { new: true }
-    ).populate('user').populate('session').populate('seats');
-
-    if (!updatedReservation) {
-      return res.status(404).json({ msg: 'Reservation not found' });
-    }
-
+    const updatedReservation = await reservationService.updateReservation(reservationId, seats, confirmed);
     res.status(200).json(updatedReservation);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message });
   }
 };
 
-// Delete a reservation
 exports.deleteReservation = async (req, res) => {
   try {
-    const reservation = await Reservation.findByIdAndDelete(req.params.id);
-    if (!reservation) {
-      return res.status(404).json({ msg: 'Reservation not found' });
-    }
-
-    // Make the seat available again
-    const seat = await Seat.findById(reservation.seats);
-    if (seat) {
-      seat.availability = true;
-      await seat.save();
-    }
-
-    res.status(200).json({ msg: 'Reservation deleted and seat made available' });
+    const reservationId = req.params.id;
+    const result = await reservationService.deleteReservation(reservationId);
+    res.status(200).json(result);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message });
   }
 };
