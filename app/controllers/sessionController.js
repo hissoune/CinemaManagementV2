@@ -1,97 +1,49 @@
-const Session = require('../models/Session');
-const Movie = require('../models/Movie');
-const Room = require('../models/Room');
+const sessionService = require('../services/sessionService');
 
 exports.createSession = async (req, res) => {
   try {
     const { movie, room, dateTime, price } = req.body;
-
-    const movieExists = await Movie.findById(movie);
-    const roomExists = await Room.findById(room);
-
-    if (!movieExists || !roomExists) {
-      return res.status(404).json({ msg: 'Movie or Room not found' });
-    }
-
-    const newSession = new Session({
-      movie,
-      room,
-      dateTime,
-      price,
-    });
-
-    await newSession.save();
+    const newSession = await sessionService.createSession(movie, room, dateTime, price);
     res.status(201).json(newSession);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message });
   }
 };
 
 exports.getAllSessions = async (req, res) => {
-   try {
-    const userId = req.user.id; 
-
-    const sessions = await Session.find()
-      .populate('movie') 
-      .populate('room') 
-      .exec();
-
-    const filteredSessions = sessions.filter(session => 
-      session.movie && session.movie.creator.toString() === userId || 
-      session.room && session.room.creator.toString() === userId
-    );
-
-    res.status(200).json(filteredSessions);
+  try {
+    const userId = req.user.id;
+    const sessions = await sessionService.getAllSessions(userId);
+    res.status(200).json(sessions);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message });
   }
 };
 
 exports.getSessionById = async (req, res) => {
   try {
-    const session = await Session.findById(req.params.id).populate('movie room');
-    if (!session) {
-      return res.status(404).json({ msg: 'Session not found' });
-    }
+    const session = await sessionService.getSessionById(req.params.id);
     res.status(200).json(session);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message });
   }
 };
 
 exports.updateSession = async (req, res) => {
   try {
     const { movie, room, dateTime, price } = req.body;
-
-    const updatedSession = await Session.findByIdAndUpdate(
-      req.params.id,
-      { movie, room, dateTime, price },
-      { new: true }
-    ).populate('movie room');
-
-    if (!updatedSession) {
-      return res.status(404).json({ msg: 'Session not found' });
-    }
-
+    const updatedSession = await sessionService.updateSession(req.params.id, movie, room, dateTime, price);
     res.status(200).json(updatedSession);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message });
   }
 };
 
 exports.deleteSession = async (req, res) => {
   try {
-    const session = await Session.findByIdAndDelete(req.params.id);
-    if (!session) {
-      return res.status(404).json({ msg: 'Session not found' });
-    }
-    res.status(200).json({ msg: 'Session deleted successfully' });
+    const result = await sessionService.deleteSession(req.params.id);
+    res.status(200).json(result);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ msg: 'Server error' });
+    res.status(500).json({ msg: err.message });
   }
 };
