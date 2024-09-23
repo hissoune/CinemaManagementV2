@@ -13,17 +13,17 @@ const transporter = nodemailer.createTransport({
 
 
 
-module.exports = {
+
     
 
 
-    sendCredentials: (email, username, password) => {
+exports.sendCredentials = (email, username, password) => {
         
   const mailOptions = {
-    from: process.env.GMAIL_USER, 
-    to: email, 
+    from: process.env.GMAIL_USER,
+    to: email,
     subject: 'Your Login Credentials',
-      html: `<p>Hello, your credentials are:</p><ul><li><strong>Username:</strong> ${username}</li><li><strong>Password:</strong> ${password}</li>
+    html: `<p>Hello, your credentials are:</p><ul><li><strong>Username:</strong> ${username}</li><li><strong>Password:</strong> ${password}</li>
     <li><strong>Email:</strong> ${email}</li>
      <li><strong>use the email and the password to sign in to get the tests </strong></li>
       </ul>`,
@@ -36,5 +36,12 @@ module.exports = {
       console.log('Email sent: ' + info.response);
     }
   });
-}
+};
+
+exports.sendRessetPass=async(email, urlToken)=> {
+  await transporter.sendMail({
+      to: email,
+      subject: 'Password Reset',
+      text: `Please click on the following link to reset your password: ${urlToken}`,
+    });
 }
