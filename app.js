@@ -8,7 +8,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 connectDB();
-
+const verifyToken = require('./app/midlwares/verifyToken');
+app.use(verifyToken);
 const adminRoutes = require('./app/routes/adminRoutes');
 const authRoutes = require('./app/routes/authRoute');
 const movieRoutes = require('./app/routes/movieRoutes');
@@ -19,7 +20,7 @@ const reservationRoutes = require('./app/routes/reservationRoutes');
 
 
 
-app.use('/api', adminRoutes); 
+app.use('/api/admins', adminRoutes); 
 
 app.use('/api/auth', authRoutes); 
 

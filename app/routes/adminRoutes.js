@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { createUser } = require('../controllers/adminController');
-const verifyToken = require('../midlwares/verifyToken');
 // const User = require('../models/User')
-const checkRole = require('../midlwares/CheckRole');
 
-router.post('/admins',verifyToken,checkRole(['admin']), createUser);
+router.post('/', createUser);
 
 // router.get('/profile', verifyToken, async (req, res) => {
 //     try {

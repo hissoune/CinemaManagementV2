@@ -25,7 +25,7 @@ exports.sendCredentials = (email, username, password) => {
     subject: 'Your Login Credentials',
     html: `<p>Hello, your credentials are:</p><ul><li><strong>Username:</strong> ${username}</li><li><strong>Password:</strong> ${password}</li>
     <li><strong>Email:</strong> ${email}</li>
-     <li><strong>use the email and the password to sign in to get the tests </strong></li>
+     <li><strong>use the email and the password to sign in  </strong></li>
       </ul>`,
   };
 
