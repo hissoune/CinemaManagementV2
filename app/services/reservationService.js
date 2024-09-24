@@ -1,6 +1,5 @@
 const Reservation = require('../models/Reservation');
 const Session = require('../models/Session');
-const Seat = require('../models/Seate');
 const User = require('../models/User');
 
 exports.createReservation = async (userId, sessionId, seatId) => {
