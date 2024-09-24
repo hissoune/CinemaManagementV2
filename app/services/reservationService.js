@@ -2,60 +2,73 @@ const Reservation = require('../models/Reservation');
 const Session = require('../models/Session');
 const User = require('../models/User');
 
-exports.createReservation = async (userId, sessionId, seatId) => {
+exports.createReservation = async (userId, sessionId, seat) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
     throw new Error('User not found');
   }
 
   const sessionExists = await Session.findById(sessionId);
-  if (!sessionExists) {
+
+   if (!sessionExists) {
     throw new Error('Session not found');
   }
 
-  const seatExists = await Seat.findById(seatId);
-  if (!seatExists || !seatExists.availability) {
-    throw new Error('Seat not found or unavailable');
-  }
+  
+  const oldreservations = await Reservation.find({ session: sessionId }) .populate({
+    path: 'session', 
+    populate: { path: 'room' } 
+  });
 
-  seatExists.availability = false;
-  await seatExists.save();
+
+   oldreservations.forEach(reserv => {
+     if (reserv.session.room.seats[seat - 1] == reserv.seats) {
+          throw new Error('this seat is allredy reserved');
+
+    }
+   });
 
   const newReservation = new Reservation({
     user: userId,
     session: sessionId,
-    seats: seatId,
+    seats: seat,
   });
 
   return await newReservation.save();
 };
 
 exports.getAllReservations = async () => {
-  return await Reservation.find().populate('user').populate('session').populate('seats');
+  return await Reservation.find().populate('user').populate('session');
 };
 
 exports.getReservationById = async (reservationId) => {
-  const reservation = await Reservation.findById(reservationId).populate('user').populate('session').populate('seats');
+  const reservation = await Reservation.findById(reservationId).populate('user').populate('session');
   if (!reservation) {
     throw new Error('Reservation not found');
   }
   return reservation;
 };
 
-exports.updateReservation = async (reservationId, seatId, confirmed) => {
-  const seatExists = await Seat.findById(seatId);
-  if (!seatExists || !seatExists.availability) {
-    throw new Error('Seat not found or unavailable');
-  }
+exports.updateReservation = async (reservationId, seat, confirmed) => {
 
-  seatExists.availability = false;
-  await seatExists.save();
+  const reserv = await Reservation.findById(reservationId);
+ const oldreservations = await Reservation.find({ session: reserv.session }) .populate({
+    path: 'session', 
+    populate: { path: 'room' } 
+  });
+
+
+   oldreservations.forEach(reserv => {
+     if (reserv.session.room.seats[seat - 1] == reserv.seats) {
+          throw new Error('this seat is allredy reserved');
+
+    }
+   });
 
   const updatedReservation = await Reservation.findByIdAndUpdate(
     reservationId,
-    { seats: seatId, confirmed },
-    { new: true }
-  ).populate('user').populate('session').populate('seats');
+    { seats: seat, confirmed },
+  ).populate('user').populate('session');
 
   if (!updatedReservation) {
     throw new Error('Reservation not found');
@@ -69,12 +82,5 @@ exports.deleteReservation = async (reservationId) => {
   if (!reservation) {
     throw new Error('Reservation not found');
   }
-
-  const seat = await Seat.findById(reservation.seats);
-  if (seat) {
-    seat.availability = true;
-    await seat.save();
-  }
-
   return { msg: 'Reservation deleted and seat made available' };
 };
