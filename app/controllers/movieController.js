@@ -1,6 +1,5 @@
 const movieService = require('../services/movieService');
 
-// Create a movie
 exports.createMovie = async (req, res) => {
   try {
     const userId = req.user.id;

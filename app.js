@@ -15,7 +15,6 @@ const authRoutes = require('./app/routes/authRoute');
 const movieRoutes = require('./app/routes/movieRoutes');
 const roomRoutes = require('./app/routes/roomRoutes');
 const sessionRoutes = require('./app/routes/sessionRoutes');
-const seatRoutes = require('./app/routes/seatRoutes');
 const reservationRoutes = require('./app/routes/reservationRoutes');
 
 
@@ -30,7 +29,6 @@ app.use('/api/roomes', roomRoutes);
 
 app.use('/api/sessions', sessionRoutes);
 
-app.use('/api/seats', seatRoutes);
 
 app.use('/api/reservations', reservationRoutes);
 
