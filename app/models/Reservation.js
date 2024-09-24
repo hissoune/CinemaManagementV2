@@ -12,8 +12,7 @@ const ReservationSchema = new mongoose.Schema({
     required: true,
   },
   seats: {
-     type: mongoose.Schema.Types.ObjectId,
-    ref:'Seat',
+     type:Number,
     required: true,
   },
   confirmed: {
