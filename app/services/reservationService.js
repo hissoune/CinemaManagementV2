@@ -1,5 +1,6 @@
 const Reservation = require('../models/Reservation');
 const Session = require('../models/Session');
+const Room = require('../models/Room');
 const User = require('../models/User');
 
 exports.createReservation = async (userId, sessionId, seat) => {
@@ -8,26 +9,26 @@ exports.createReservation = async (userId, sessionId, seat) => {
     throw new Error('User not found');
   }
 
-  const sessionExists = await Session.findById(sessionId);
-
-   if (!sessionExists) {
+  const sessionExists = await Session.findById(sessionId).populate('room');
+  if (!sessionExists) {
     throw new Error('Session not found');
   }
 
-  
-  const oldreservations = await Reservation.find({ session: sessionId }) .populate({
-    path: 'session', 
-    populate: { path: 'room' } 
+  const room = sessionExists.room;
+
+  const oldReservations = await Reservation.find({ session: sessionId });
+
+  oldReservations.forEach(reservation => {
+    if (reservation.seats === room.seats[seat-1].number) {
+      throw new Error('This seat is already reserved');
+    }
   });
 
-
-   oldreservations.forEach(reserv => {
-     if (reserv.session.room.seats[seat - 1] == reserv.seats) {
-          throw new Error('this seat is allredy reserved');
-
-    }
-   });
-
+   await Room.findOneAndUpdate(
+    { _id: room._id, [`seats.${seat - 1}.number`]: seat },
+    { $set: { [`seats.${seat - 1}.available`]: false } },
+    { new: true }
+  );
   const newReservation = new Reservation({
     user: userId,
     session: sessionId,
@@ -52,22 +53,24 @@ exports.getReservationById = async (reservationId) => {
 exports.updateReservation = async (reservationId, seat, confirmed) => {
 
   const reserv = await Reservation.findById(reservationId);
- const oldreservations = await Reservation.find({ session: reserv.session }) .populate({
+ const oldreservations = await Reservation.find({ session: reserv.session }).populate({
     path: 'session', 
     populate: { path: 'room' } 
   });
 
 
    oldreservations.forEach(reserv => {
-     if (reserv.session.room.seats[seat - 1] == reserv.seats) {
+     if (reserv.session.room.seats[seat - 1].number == reserv.seats) {
           throw new Error('this seat is allredy reserved');
 
     }
-   });
+   }); 
+  
 
   const updatedReservation = await Reservation.findByIdAndUpdate(
     reservationId,
     { seats: seat, confirmed },
+    { new: true}
   ).populate('user').populate('session');
 
   if (!updatedReservation) {
