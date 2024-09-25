@@ -138,13 +138,38 @@ exports.confirmeReservation = async (reservId, userId) => {
 
 }
 
-exports.deleteReservation = async (reservationId) => {
+exports.deleteReservation = async (reservationId,userId) => {
 
-  const reservation = await Reservation.findByIdAndDelete(reservationId);
-
+ const reservation = await Reservation.findOne({_id:reservationId , user:userId}).populate({
+    path: 'session', 
+    populate: [
+      { path: 'room' },  
+      { path: 'movie' }  
+    ]
+ }); 
+  
   if (!reservation) {
     throw new Error('Reservation not found');
   }
+  
+  if (reservation.confirmed) {
+        throw new Error('Reservation is confirmed');
+
+  }
+  
+  const room = reservation.session.room;
+
+  await Room.findOneAndUpdate(
+    { _id: room._id},
+    { $set: { [`seats.${reservation.seats - 1}.available`]: true } },
+    { new: true }
+  );
+  await Reservation.findByIdAndUpdate(
+    { _id: reservationId },
+    { isDeleted: true },
+  );
+
+  
 
   return { msg: 'Reservation deleted and seat made available' };
 };

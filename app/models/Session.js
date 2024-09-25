@@ -28,4 +28,4 @@ SessionSchema.pre(/^find/, function (next) {
   this.where({ isDeleted: false });
   next();
 });
-module.exports = mongoose.model('Session', SessionSchema);
+module.exports = mongoose.model('Session', SessionSchema); 
