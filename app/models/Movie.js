@@ -28,7 +28,14 @@ const MovieSchema = new mongoose.Schema({
     type: Number,
     min: 0,
     max: 10,
+  },
+   isDeleted: {
+    type: Boolean,
+    default: false,
   }
 }, { timestamps: true });
-
+MovieSchema.pre(/^find/, function (next) {
+  this.where({ isDeleted: false });
+  next();
+});
 module.exports = mongoose.model('Movie', MovieSchema);

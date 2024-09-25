@@ -24,6 +24,10 @@ const RoomSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+   isDeleted: {
+    type: Boolean,
+    default: false,
+  }
 }, { timestamps: true });
 
 RoomSchema.pre('save', function(next) {
@@ -35,5 +39,10 @@ RoomSchema.pre('save', function(next) {
   }
   next();
 });
+RoomSchema.pre(/^find/, function (next) {
+  this.where({ isDeleted: false });
+  next();
+});
+
 
 module.exports = mongoose.model('Room', RoomSchema);

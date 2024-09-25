@@ -18,7 +18,16 @@ const ReservationSchema = new mongoose.Schema({
   confirmed: {
     type: Boolean,
     default: false,
+  },
+  isDeleted: {
+    type: Boolean,
+    default: false,
   }
 }, { timestamps: true });
+
+ReservationSchema.pre(/^find/, function (next) {
+  this.where({ isDeleted: false });
+  next();
+});
 
 module.exports = mongoose.model('Reservation', ReservationSchema);
