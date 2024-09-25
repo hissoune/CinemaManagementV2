@@ -36,7 +36,8 @@ exports.updateReservation = async (req, res) => {
   try {
     const reservationId = req.params.id;
     const userId = req.user.id;
-    const updatedReservation = await reservationService.updateReservation(reservationId,userId);
+    const { seats } = req.body;
+    const updatedReservation = await reservationService.updateReservation(reservationId,userId,seats);
     res.status(200).json(updatedReservation);
   } catch (err) {
     res.status(500).json({ msg: err.message });

@@ -52,36 +52,54 @@ exports.getReservationById = async (reservationId) => {
   return reservation;
 };
 
-exports.updateReservation = async (reservationId,userId) => {
+exports.updateReservation = async (reservationId,userId,seat) => {
  const userExists = await User.findById(userId);
   if (!userExists) {
     throw new Error('User not found');
   }
   const reserv = await Reservation.findById(reservationId).populate({
     path: 'session', 
-    populate: { path: 'room' }, 
-    populate: { path: 'movie' } 
+    populate: [
+      { path: 'room' },  
+      { path: 'movie' }  
+    ]
+});
+
+ const oldreservations = await Reservation.find({ session: reserv.session , _id: { $ne: reserv._id }}).populate({
+    path: 'session', 
+    populate: { path: 'room' } 
   });
 
-//  const oldreservations = await Reservation.find({ session: reserv.session }).populate({
-//     path: 'session', 
-//     populate: { path: 'room' } 
-//   });
 
+   oldreservations.forEach(reserv => {
+     if (reserv.session.room.seats[seat - 1].number == reserv.seats) {
+          throw new Error('this seat is allredy reserved');
 
-  //  oldreservations.forEach(reserv => {
-  //    if (reserv.session.room.seats[seat - 1].number == reserv.seats) {
-  //         throw new Error('this seat is allredy reserved');
-
-  //   }
-  //  }); 
+    }
+   }); 
   const session = reserv.session;
   const room = reserv.session.room;
   const movie = reserv.session.movie;
 
+
+  if (room.seats[reserv.seats - 1].number != seat) {
+    await Room.findOneAndUpdate(
+    { _id: room._id},
+    { $set: { [`seats.${reserv.seats - 1}.available`]: true } },
+    { new: true }
+    );
+     await Room.findOneAndUpdate(
+     {_id: room._id},
+    { $set: { [`seats.${seat - 1}.available`]: false } },
+    { new: true }
+  );
+    
+  }
+ 
+
   const updatedReservation = await Reservation.findByIdAndUpdate(
     reservationId,
-    { confirmed:true },
+    { seats:seat},
     { new: true}
   ).populate('user').populate('session');
 
@@ -95,9 +113,12 @@ exports.updateReservation = async (reservationId,userId) => {
 };
 
 exports.deleteReservation = async (reservationId) => {
+
   const reservation = await Reservation.findByIdAndDelete(reservationId);
+
   if (!reservation) {
     throw new Error('Reservation not found');
   }
+  
   return { msg: 'Reservation deleted and seat made available' };
 };
