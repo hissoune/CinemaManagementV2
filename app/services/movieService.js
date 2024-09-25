@@ -1,5 +1,6 @@
 const Movie = require('../models/Movie');
 const User = require('../models/User');
+const Session = require('../models/Session');
 
 // Create a new movie
 exports.createMovie = async (userId, movieData) => {
@@ -21,7 +22,6 @@ exports.createMovie = async (userId, movieData) => {
   return await newMovie.save();
 };
 
-// Get all movies created by a user
 exports.getMovies = async (userId) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
@@ -31,7 +31,6 @@ exports.getMovies = async (userId) => {
   return await Movie.find({ creator: userExists._id });
 };
 
-// Get a movie by its ID and ensure the user is the creator
 exports.getMovieById = async (userId, movieId) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
@@ -46,7 +45,6 @@ exports.getMovieById = async (userId, movieId) => {
   return movie;
 };
 
-// Update a movie
 exports.updateMovie = async (userId, movieId, updateData) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
@@ -58,17 +56,21 @@ exports.updateMovie = async (userId, movieId, updateData) => {
     throw new Error('Movie not found');
   }
 
-  Object.assign(movie, updateData); // Merge new data with the existing movie object
+  Object.assign(movie, updateData); 
   return await movie.save();
 };
 
-// Delete a movie
 exports.deleteMovie = async (userId, movieId) => {
   const movie = await Movie.findOne({ _id: movieId, creator: userId });
   if (!movie) {
     throw new Error('Movie not found or you are not the creator');
   }
+   const session = await Session.find({ movie: movieId});
+  if (session.length>0) {
+        throw new Error('Movie have a Session');
 
-  await Movie.findByIdAndDelete(movieId);
+  }
+
+  await Movie.findByIdAndUpdate(movieId,{isDeleted:true});
   return { msg: 'Movie deleted successfully' };
 };

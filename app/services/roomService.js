@@ -1,5 +1,6 @@
 const Room = require('../models/Room');
 const User = require('../models/User');
+const Session = require('../models/Session');
 
 exports.createRoom = async (userId, name, capacity, location) => {
   const userExists = await User.findById(userId);
@@ -52,10 +53,16 @@ exports.updateRoom = async (roomId, userId, updateData) => {
 
 exports.deleteRoom = async (roomId, userId) => {
   const room = await Room.findOne({ _id: roomId, creator: userId });
+  console.log(room);
+  
   if (!room) {
     throw new Error('Room not found or you are not the creator');
   }
+  const session = await Session.find({ room: roomId});
+  if (session.length>0) {
+        throw new Error('Room have a Session');
 
-  await Room.findByIdAndDelete(roomId);
+  }
+  await Room.findByIdAndUpdate(roomId, {isDeleted: true});
   return { msg: 'Room deleted successfully' };
 };
