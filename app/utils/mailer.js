@@ -38,10 +38,33 @@ exports.sendCredentials = (email, username, password) => {
   });
 };
 
-exports.sendRessetPass=async(email, urlToken)=> {
+exports.sendRessetPass = async (email, urlToken) => {
   await transporter.sendMail({
-      to: email,
-      subject: 'Password Reset',
-      text: `Please click on the following link to reset your password: ${urlToken}`,
-    });
+    to: email,
+    subject: 'Password Reset',
+    
+    text: `Please click on the following link to reset your password: ${urlToken}`,
+  });
+  
+};
+
+exports.sendTiketMail = async (user, reservation, session,room, movie) => {
+  await transporter.sendMail({
+    to: user.email,
+    subject: 'Session Ticket Confirmation',
+    html: `
+      <p>Hello ${user.name},</p>
+      <p>Your reservation has been confirmed!</p>
+      <ul>
+        <li><strong>Movie:</strong> ${movie.title}</li>
+        <li><strong>Session Date and Time:</strong> ${session.dateTime}</li>
+        <li><strong>Room:</strong> ${room.name}</li>
+        <li><strong>Seats:</strong> ${reservation.seats}</li>
+        <li><strong>Price:</strong> ${session.price} USD</li>
+      </ul>
+      <p>Thank you for choosing our service! Enjoy your movie!</p>
+    `,
+  });
 }
+
+

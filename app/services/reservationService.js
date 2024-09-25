@@ -2,19 +2,21 @@ const Reservation = require('../models/Reservation');
 const Session = require('../models/Session');
 const Room = require('../models/Room');
 const User = require('../models/User');
-
+const mailer = require('../utils/mailer');
 exports.createReservation = async (userId, sessionId, seat) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
     throw new Error('User not found');
   }
 
-  const sessionExists = await Session.findById(sessionId).populate('room');
+  const sessionExists = await Session.findById(sessionId).populate('room').populate('movie');
   if (!sessionExists) {
     throw new Error('Session not found');
   }
 
   const room = sessionExists.room;
+
+  const movie = sessionExists.movie;
 
   const oldReservations = await Reservation.find({ session: sessionId });
 
@@ -50,32 +52,44 @@ exports.getReservationById = async (reservationId) => {
   return reservation;
 };
 
-exports.updateReservation = async (reservationId, seat, confirmed) => {
-
-  const reserv = await Reservation.findById(reservationId);
- const oldreservations = await Reservation.find({ session: reserv.session }).populate({
+exports.updateReservation = async (reservationId,userId) => {
+ const userExists = await User.findById(userId);
+  if (!userExists) {
+    throw new Error('User not found');
+  }
+  const reserv = await Reservation.findById(reservationId).populate({
     path: 'session', 
-    populate: { path: 'room' } 
+    populate: { path: 'room' }, 
+    populate: { path: 'movie' } 
   });
 
+//  const oldreservations = await Reservation.find({ session: reserv.session }).populate({
+//     path: 'session', 
+//     populate: { path: 'room' } 
+//   });
 
-   oldreservations.forEach(reserv => {
-     if (reserv.session.room.seats[seat - 1].number == reserv.seats) {
-          throw new Error('this seat is allredy reserved');
 
-    }
-   }); 
-  
+  //  oldreservations.forEach(reserv => {
+  //    if (reserv.session.room.seats[seat - 1].number == reserv.seats) {
+  //         throw new Error('this seat is allredy reserved');
+
+  //   }
+  //  }); 
+  const session = reserv.session;
+  const room = reserv.session.room;
+  const movie = reserv.session.movie;
 
   const updatedReservation = await Reservation.findByIdAndUpdate(
     reservationId,
-    { seats: seat, confirmed },
+    { confirmed:true },
     { new: true}
   ).populate('user').populate('session');
 
   if (!updatedReservation) {
     throw new Error('Reservation not found');
   }
+  await mailer.sendTiketMail(userExists, updatedReservation, session,room, movie); 
+
 
   return updatedReservation;
 };
