@@ -12,8 +12,10 @@ exports.createReservation = async (req, res) => {
 };
 
 exports.getAllReservations = async (req, res) => {
+  const userId = req.user.id;
   try {
-    const reservations = await reservationService.getAllReservations();
+
+    const reservations = await reservationService.getAllReservations(userId);
     res.status(200).json(reservations);
   } catch (err) {
     res.status(500).json({ msg: err.message });

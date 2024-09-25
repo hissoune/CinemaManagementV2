@@ -38,8 +38,8 @@ exports.createReservation = async (userId, sessionId, seat) => {
   return await newReservation.save();
 };
 
-exports.getAllReservations = async () => {
-  return await Reservation.find().populate('user').populate('session');
+exports.getAllReservations = async (userId) => {
+  return await Reservation.find({user:userId}).populate('user').populate('session');
 };
 
 exports.getReservationById = async (reservationId) => {
