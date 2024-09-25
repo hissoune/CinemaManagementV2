@@ -22,20 +22,32 @@ const verifyToken = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded.user; 
-       
-    if (req.path.startsWith('/api/admins') || req.path.startsWith('/api/auth') || req.path.startsWith('/api/movies') || req.path.startsWith('/api/roomes') || req.path.startsWith('/api/sessions') ) {
-      if (req.user.role !== 'admin') {
-        return res.status(403).json({ msg: 'Access denied: Admins only' });
-      }
-      return next(); 
-    }
-    if (req.path.startsWith('/api/reservations')) {
-       if (req.user.role !== 'client') {
-        return res.status(403).json({ msg: 'Access denied: Admins only' });
-      }
-            return next(); 
 
+    switch (true) {
+      case req.path.startsWith('/api/auth'):
+        if (token && !req.path.startsWith('/api/auth/logout')) {
+          return res.status(302).json({ msg: 'You are already logged in. Please log out first.' });
 
+        }
+        break;
+
+      case req.path.startsWith('/api/admins'):
+      case req.path.startsWith('/api/movies'):
+      case req.path.startsWith('/api/rooms'):
+      case req.path.startsWith('/api/sessions'):
+        if (req.user.role !== 'admin') {
+          return res.status(403).json({ msg: 'Access denied: Admins only' });
+        }
+        break;
+
+      case req.path.startsWith('/api/reservations'):
+        if (req.user.role !== 'client') {
+          return res.status(403).json({ msg: 'Access denied: Clients only' });
+        }
+        break;
+
+      default:
+        break;
     }
 
     next(); 
