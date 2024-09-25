@@ -106,11 +106,37 @@ exports.updateReservation = async (reservationId,userId,seat) => {
   if (!updatedReservation) {
     throw new Error('Reservation not found');
   }
-  await mailer.sendTiketMail(userExists, updatedReservation, session,room, movie); 
 
 
   return updatedReservation;
 };
+
+
+exports.confirmeReservation = async (reservId, userId) => {
+  const userExists = await User.findById(userId);
+  if (!userExists) {
+    throw new Error('User not found');
+  }
+   const reserv = await Reservation.findOne({_id: reservId ,user:userId }).populate({
+    path: 'session', 
+    populate: [
+      { path: 'room' },  
+      { path: 'movie' }  
+    ]
+   });
+   const session = reserv.session;
+  const room = reserv.session.room;
+  const movie = reserv.session.movie;
+
+  const confirmedReservation = await Reservation.findByIdAndUpdate(
+  { _id: reservId },
+  {confirmed: true},
+  {new: true},
+)
+      await mailer.sendTiketMail(userExists,confirmedReservation, session,room, movie); 
+  return await confirmedReservation;
+
+}
 
 exports.deleteReservation = async (reservationId) => {
 
@@ -119,6 +145,6 @@ exports.deleteReservation = async (reservationId) => {
   if (!reservation) {
     throw new Error('Reservation not found');
   }
-  
+
   return { msg: 'Reservation deleted and seat made available' };
 };

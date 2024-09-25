@@ -44,6 +44,19 @@ exports.updateReservation = async (req, res) => {
   }
 };
 
+
+exports.confirmeReservation = async (req, res) => {
+  const userId = req.user.id;
+  const reservId = req.params.id;
+  try {
+          const result = await reservationService.confirmeReservation(reservId,userId);
+    res.status(200).json(result);
+  } catch (error) {
+     res.status(500).json({ msg: err.message });
+  }
+
+}
+
 exports.deleteReservation = async (req, res) => {
   try {
     const reservationId = req.params.id;
