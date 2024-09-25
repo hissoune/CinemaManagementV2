@@ -1,6 +1,8 @@
 const Session = require('../models/Session');
 const Movie = require('../models/Movie');
 const Room = require('../models/Room');
+const Reservation = require('../models/Reservation');
+
 
 exports.createSession = async (movieId, roomId, dateTime, price) => {
   const movieExists = await Movie.findById(movieId);
@@ -54,8 +56,24 @@ exports.updateSession = async (sessionId, movieId, roomId, dateTime, price) => {
   return updatedSession;
 };
 
-exports.deleteSession = async (sessionId) => {
-  const session = await Session.findByIdAndDelete(sessionId);
+exports.deleteSession = async (sessionId, userId) => {
+  const reservations =await Reservation.find({ session: sessionId });
+  
+  if (reservations.length > 0) {
+        throw new Error('Cant delete Session that reserved');
+
+  }
+  const sessionn = await Session.findById(sessionId).populate('room');
+  if (sessionn.room.creator != userId) {
+            throw new Error('you are not the creator');
+
+  }
+ const session = await Session.findOneAndUpdate(
+    { _id: sessionId},
+    { isDeleted: true },
+    { new: true } 
+  );
+
   if (!session) {
     throw new Error('Session not found');
   }

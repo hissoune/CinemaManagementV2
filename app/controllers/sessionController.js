@@ -40,8 +40,11 @@ exports.updateSession = async (req, res) => {
 };
 
 exports.deleteSession = async (req, res) => {
+  const userId = req.user.id;
+  const sessionId = req.params.id;
+  
   try {
-    const result = await sessionService.deleteSession(req.params.id);
+    const result = await sessionService.deleteSession(sessionId,userId);
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ msg: err.message });
