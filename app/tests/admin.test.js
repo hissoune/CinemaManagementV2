@@ -101,6 +101,20 @@ describe('adminController tests', () => {
     expect(res.statusCode).toBe(404);
     expect(res.data).toEqual({ error: 'User not found' });
   });
+    test('updateUser should return 400 if there is an error', async () => {
+    adminService.updateUser.mockRejectedValue(new Error('Something went wrong'));
+
+    await adminController.updateUser(req, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.data).toEqual({ error: 'Something went wrong' });
+    });
     
+
+
+
+
     
 });
+    
+
