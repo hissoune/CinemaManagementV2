@@ -25,7 +25,7 @@ exports.createMovie = async (userId, movieData) => {
 exports.getMovies = async (userId) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
-    throw new Error('User not found');
+ new Error('User not found');
   }
   
   return await Movie.find({ creator: userExists._id });

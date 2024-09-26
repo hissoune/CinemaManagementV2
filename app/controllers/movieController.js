@@ -1,6 +1,10 @@
 const movieService = require('../services/movieService');
-
+const movieValidation = require('../utils/validations/movieValidation')
 exports.createMovie = async (req, res) => {
+   const { error } = movieValidation.validateMovie(req.body);
+  if (error) {
+   return  res.status(400).json(error.details[0].message)
+  }
   try {
     const userId = req.user.id;
     const movieData = req.body;
@@ -36,6 +40,10 @@ exports.getMovieById = async (req, res) => {
 
 // Update a movie
 exports.updateMovie = async (req, res) => {
+  const { error } = movieValidation.validateMovie(req.body);
+  if (error) {
+   return  res.status(400).json(error.details[0].message)
+  }
   try {
     const userId = req.user.id;
     const movieId = req.params.id;
