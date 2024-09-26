@@ -7,7 +7,7 @@ describe('Movie Controller', () => {
 
     beforeEach(() => {
         req = {
-            user: { id: 'testUserId' }, // Simulate authenticated user
+            user: { id: 'testUserId' }, 
             body: {
                 title: "Inception",
                 description: "A mind-bending thriller about dream invasion.",
