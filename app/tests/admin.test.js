@@ -14,7 +14,7 @@ describe('adminController tests', () => {
         password: '12-02-2000',
         role: 'admin'
       },
-      params: { adminId: 'adminId' }
+      params: {id: 'adminId' }
     };
 
     res = {
@@ -73,12 +73,34 @@ describe('adminController tests', () => {
         expect(res.data).toEqual(mockAdmins);
     });
 
-    test('get all users must return statusCode 400 if ther is any error',async () => {
-        adminService.getAllUsers.mockRejectedValue({ error: "erore"});
+    test('get all users must return statusCode 400 if ther is any error', async () => {
+        adminService.getAllUsers.mockRejectedValue({ error: "erore" });
         await adminController.getAllUsers(req, res);
         expect(res.statusCode).toBe(400);
 
-    })
+    });
+     test('updateUser should return 200 and updated user', async () => {
+    const mockUpdatedUser = {
+      id: 'testUserId',
+      name: 'Updated Name',
+      email: 'updated@example.com',
+    };
+
+    adminService.updateUser.mockResolvedValue(mockUpdatedUser);
+
+    await adminController.updateUser(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res.data).toEqual(mockUpdatedUser);
+     });
+     test('updateUser should return 404 if user not found', async () => {
+    adminService.updateUser.mockResolvedValue(null);
+
+    await adminController.updateUser(req, res);
+
+    expect(res.statusCode).toBe(404);
+    expect(res.data).toEqual({ error: 'User not found' });
+  });
     
     
 });
