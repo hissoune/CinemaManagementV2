@@ -42,7 +42,20 @@ describe('reservation tests ', () => {
         expect(res.statusCode).toBe(201);
         expect(res.data).toEqual(mockResavation);
       
+    });
+    test('get all reservations for specific user must return a status with 200',async () => {
+        const mokReaservations = [
+            { id: "rhe", session: "^pskjhgcdjzkamdljdj", seats: 4 },
+            { id: "rhe", session: "^pskjhgcdjzkamdljdj", seats: 4 }
+        ];
+
+        reservationService.getAllReservations.mockResolvedValue(mokReaservations);
+
+        await reservationController.getAllReservations(req, res);
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual(mokReaservations)
     })
+    
     
 
 
