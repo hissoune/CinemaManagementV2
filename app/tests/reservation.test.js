@@ -72,14 +72,25 @@ describe('reservation tests ', () => {
 
         req.params.reservationId = 'reservationId';
         req.body = {
-            session:"sdfgfhntghdsqfdds",
+            session: "sdfgfhntghdsqfdds",
         }
-       await reservationController.updateReservation(req, res);
+        await reservationController.updateReservation(req, res);
         expect(res.statusCode).toBe(200);
         expect(res.data).toEqual(mockResavation);
 
       
+    });
+
+    test('delet reservation must return a statusCode 200', async () => {
+        reservationService.deleteReservation.mockResolvedValue({ msg: 'Reservation deleted and seat made available' });
+        req.params.reservationId = 'reservationId';
+        await reservationController.deleteReservation(req, res);
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual({ msg: 'Reservation deleted and seat made available' });
+
+      
     })
+    
     
     
     
