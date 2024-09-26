@@ -81,6 +81,15 @@ describe('session test', () => {
 
     });
     
+    test('delete session must return a status code with 200 ', async() => {
+        sessionService.deleteSession.mockResolvedValue({ msg: 'Session deleted successfully' });
+        req.params.sessionId = 'sessionId';
+        await sessionController.deleteSession(req, res);
+          expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual({ msg: 'Session deleted successfully' });
+
+
+    })
     
     
 });
