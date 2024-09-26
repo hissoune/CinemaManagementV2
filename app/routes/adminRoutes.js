@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { createUser } = require('../controllers/adminController');
+const adminController = require('../controllers/adminController');
 // const User = require('../models/User')
 
-router.post('/', createUser);
+router.post('/', adminController.createUser);
+router.get('/', adminController.getAllUsers);
+router.put('/update/:id', adminController.getAllUsers);
+router.get('/:id', adminController.getUserById);
+router.delete('/delete/:id', adminController.deleteUser);
 
 // router.get('/profile', verifyToken, async (req, res) => {
 //     try {

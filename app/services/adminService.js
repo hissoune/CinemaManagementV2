@@ -38,6 +38,6 @@ exports.getUserById = async (id) => {
 };
 
 exports.getAllUsers = async () => {
-  const users = await User.find();
+  const users = await User.find({role:"admin"});
   return users;
 };

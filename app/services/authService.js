@@ -19,7 +19,7 @@ exports.login = async (email, password) => {
   }
 
   const payload = { user: { id: user._id, role: user.role } };
-  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1000h' });
 
   return token;
 };

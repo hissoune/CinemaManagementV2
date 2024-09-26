@@ -25,7 +25,7 @@ describe('Auth Service', () => {
       expect(result).toBe('testtoken');
       expect(User.findOne).toHaveBeenCalledWith({ email: 'test@example.com' });
       expect(bcrypt.compare).toHaveBeenCalledWith('password123', 'hashedpassword');
-      expect(jwt.sign).toHaveBeenCalledWith({ user: { id: mockUser._id, role: mockUser.role } }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      expect(jwt.sign).toHaveBeenCalledWith({ user: { id: mockUser._id, role: mockUser.role } }, process.env.JWT_SECRET, { expiresIn: '1000h' });
     });
 
     test('should throw an error if user not found', async () => {

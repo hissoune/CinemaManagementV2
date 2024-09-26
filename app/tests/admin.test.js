@@ -56,4 +56,21 @@ describe('adminController tests', () => {
 
     expect(res.data).toEqual({ error: 'Service failure' });
   });
+    
+    test('get all users must return statusCode 200', async () => {
+        const mockAdmins = [
+            
+            {
+                name: "ghtfygjuhkj",
+                email: "jhvhb",
+                role: "admin"
+            }
+        ];
+        adminService.getAllUsers.mockResolvedValue(mockAdmins);
+
+        await adminController.getAllUsers(req, res);
+        expect(res.statusCode).toBe(200);
+
+    });
+    
 });
