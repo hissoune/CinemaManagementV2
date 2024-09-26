@@ -59,7 +59,7 @@ describe('roomController', () => {
       
     });
 
-    test('get room by id have to return status with 200',async () => {
+    test('get room by id have to return status with 200', async () => {
         const mockRoom = { id: 'room1', name: 'Inception', capacity: 22 };
         
         roomService.getRoomById.mockResolvedValue(mockRoom);
@@ -69,7 +69,30 @@ describe('roomController', () => {
         expect(res.statusCode).toBe(200);
         expect(res.data).toEqual(mockRoom);
       
+    });
+
+    test('updateroom must return status with 200', async () => {
+        const mockRoom = { id: 'room1', name: 'Inception', capacity: 22 };
+        
+        roomService.updateRoom.mockResolvedValue(mockRoom);
+        req.params.roomId = 'room1';
+        req.body = { title: "yeah bro" };
+        await roomController.updateRoom(req, res);
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual(mockRoom);
+
+    });
+
+    test('delete room must return a status of 200', async () => {
+        roomService.deleteRoom.mockResolvedValue({ msg: 'Room deleted successfully' });
+        req.params.roomId = 'room1';
+        await roomController.deleteRoom(req, res);
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual({ msg: 'Room deleted successfully' });
+
     })
+    
+    
     
     
         
