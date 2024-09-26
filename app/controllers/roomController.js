@@ -1,6 +1,10 @@
 const roomService = require('../services/roomService');
-
+const roomValidation = require('../utils/validations/roomValidation');
 exports.createRoom = async (req, res) => {
+   const { error } = roomValidation.validateRoom(req.body);
+  if (error) {
+   return  res.status(400).json(error.details[0].message)
+  }
   try {
     const userId = req.user.id;
     const { name, capacity, location } = req.body;
@@ -33,6 +37,10 @@ exports.getRoomById = async (req, res) => {
 };
 
 exports.updateRoom = async (req, res) => {
+   const { error } = roomValidation.validateRoom(req.body);
+  if (error) {
+   return  res.status(400).json(error.details[0].message)
+  }
   try {
     const userId = req.user.id;
     const roomId = req.params.id;

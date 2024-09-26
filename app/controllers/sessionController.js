@@ -1,6 +1,10 @@
 const sessionService = require('../services/sessionService');
-
+const sessionValidation = require('../utils/validations/sessionValidation');
 exports.createSession = async (req, res) => {
+   const { error } = sessionValidation.validatSession(req.body);
+  if (error) {
+   return  res.status(400).json(error.details[0].message)
+  }
   try {
     const { movie, room, dateTime, price } = req.body;
     const newSession = await sessionService.createSession(movie, room, dateTime, price);
@@ -30,6 +34,10 @@ exports.getSessionById = async (req, res) => {
 };
 
 exports.updateSession = async (req, res) => {
+   const { error } = sessionValidation.validatSession(req.body);
+  if (error) {
+   return  res.status(400).json(error.details[0].message)
+  }
   try {
     const { movie, room, dateTime, price } = req.body;
     const updatedSession = await sessionService.updateSession(req.params.id, movie, room, dateTime, price);
