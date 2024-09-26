@@ -14,6 +14,7 @@ jest.mock('../utils/mailer');
 describe('Auth Service', () => {
   
   describe('login', () => {
+
     test('should return a JWT token if credentials are correct', async () => {
       const mockUser = { _id: 'testUserId', email: 'test@example.com', password: 'hashedpassword', role: 'admin' };
       User.findOne.mockResolvedValue(mockUser);
@@ -42,6 +43,7 @@ describe('Auth Service', () => {
   });
 
   describe('register', () => {
+
     test('should create a new user', async () => {
       const mockUser = { _id: 'testUserId', name: 'Test', email: 'test@example.com' };
       const newUser = { name: 'Test', email: 'test@example.com', password: 'password123', role: 'user' };
@@ -52,9 +54,11 @@ describe('Auth Service', () => {
       expect(result).toEqual(mockUser);
       expect(User.prototype.save).toHaveBeenCalled();
     });
+
   });
 
   describe('logout', () => {
+    
     test('should add token to the blacklist', async () => {
       const token = 'testtoken';
       jwt.decode.mockReturnValue({ exp: Math.floor(Date.now() / 1000) + 3600 });

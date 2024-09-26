@@ -43,7 +43,8 @@ describe('reservation tests ', () => {
         expect(res.data).toEqual(mockResavation);
       
     });
-    test('get all reservations for specific user must return a status with 200',async () => {
+    
+    test('get all reservations for specific user must return a status with 200', async () => {
         const mokReaservations = [
             { id: "rhe", session: "^pskjhgcdjzkamdljdj", seats: 4 },
             { id: "rhe", session: "^pskjhgcdjzkamdljdj", seats: 4 }
@@ -54,7 +55,32 @@ describe('reservation tests ', () => {
         await reservationController.getAllReservations(req, res);
         expect(res.statusCode).toBe(200);
         expect(res.data).toEqual(mokReaservations)
+    });
+
+    test('get one reservation must return a value with 200', async () => {
+        const mockResavation = { id: "rhe", session: "^pskjhgcdjzkamdljdj", seats: 4 };
+        reservationService.getReservationById.mockResolvedValue(mockResavation);
+
+        await reservationController.getReservationById(req,res)
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual(mockResavation);
+    });
+    
+    test('the update reservation must return a statusCode 200', async () => {
+        const mockResavation = { id: "rhe", session: "^pskjhgcdjzkamdljdj", seats: 4 };
+        reservationService.updateReservation.mockResolvedValue(mockResavation);
+
+        req.params.reservationId = 'reservationId';
+        req.body = {
+            session:"sdfgfhntghdsqfdds",
+        }
+       await reservationController.updateReservation(req, res);
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual(mockResavation);
+
+      
     })
+    
     
     
 
