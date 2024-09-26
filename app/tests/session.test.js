@@ -60,7 +60,7 @@ describe('session test', () => {
 
 
     });
-    test('get one session must return a statuscode with 200 ',async () => {
+    test('get one session must return a statuscode with 200 ', async () => {
         const mocksession = { id: 'session1', movie: 'dsfghjfdrsezzeqruj', room: 'dfghfjkljjhgdfsqsdfg', dateTime: '12-02-2000', price: 222 };
 
         sessionService.getSessionById.mockResolvedValue(mocksession);
@@ -68,7 +68,19 @@ describe('session test', () => {
         await sessionController.getSessionById(req, res);
         expect(res.statusCode).toBe(200);
         expect(res.data).toEqual(mocksession);
-    })
+    });
+    test('update session must return a status code  with 200', async () => {
+        const mocksession = { id: 'session1', movie: 'dsfghjfdrsezzeqruj', room: 'dfghfjkljjhgdfsqsdfg', dateTime: '12-02-2000', price: 222 };
+        sessionService.updateSession.mockResolvedValue(mocksession);
+
+        req.params.sessionId = 'sessionId';
+        req.body = { price: 322 };
+        await sessionController.updateSession(req, res);
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual(mocksession)
+
+    });
+    
     
     
 });
