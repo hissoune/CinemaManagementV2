@@ -70,7 +70,15 @@ describe('adminController tests', () => {
 
         await adminController.getAllUsers(req, res);
         expect(res.statusCode).toBe(200);
-
+        expect(res.data).toEqual(mockAdmins);
     });
+
+    test('get all users must return statusCode 400 if ther is any error',async () => {
+        adminService.getAllUsers.mockRejectedValue({ error: "erore"});
+        await adminController.getAllUsers(req, res);
+        expect(res.statusCode).toBe(400);
+
+    })
+    
     
 });
