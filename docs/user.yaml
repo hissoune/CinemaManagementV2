@@ -1,0 +1,217 @@
+openapi: 3.0.0
+info:
+  title: Cinema Management API
+  version: 0.1.0
+  description: |
+    API for managing cinema resources such as movies, rooms, sessions, reservations, and users.
+    Provides user authentication, seat reservations, and admin functionalities.
+  contact:
+    name: Khalid Hissoune
+  servers:
+    - url: http://localhost:3000
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Log in a user
+      requestBody:
+        description: User login credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/Login'
+      responses:
+        200:
+          description: User successfully logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/AuthResponse'
+        400:
+          description: Invalid login credentials
+          
+  /users/:
+    post:
+      tags:
+        - User
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/User'
+      responses:
+        201:
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/UserResponse'
+        400:
+          description: Invalid input data
+
+  /movies/:
+    get:
+      tags:
+        - Movies
+      summary: Get all movies
+      responses:
+        200:
+          description: List of movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/Movie'
+
+  /rooms/:
+    get:
+      tags:
+        - Rooms
+      summary: Get all rooms
+      responses:
+        200:
+          description: List of cinema rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/Room'
+
+  /sessions/:
+    get:
+      tags:
+        - Sessions
+      summary: Get all sessions
+      responses:
+        200:
+          description: List of movie sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/definitions/Session'
+
+  /reservations/:
+    post:
+      tags:
+        - Reservations
+      summary: Make a reservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/Reservation'
+      responses:
+        201:
+          description: Reservation made successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/ReservationResponse'
+        400:
+          description: Invalid reservation data
+
+definitions:
+  Login:
+    type: object
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+        format: password
+
+  AuthResponse:
+    type: object
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/UserResponse'
+
+  User:
+    type: object
+    properties:
+      username:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+        format: password
+
+  UserResponse:
+    type: object
+    properties:
+      id:
+        type: string
+      username:
+        type: string
+      email:
+        type: string
+
+  Movie:
+    type: object
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+      genre:
+        type: string
+      releaseDate:
+        type: string
+        format: date
+
+  Room:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      seats:
+        type: array
+        items:
+          type: integer
+
+  Session:
+    type: object
+    properties:
+      id:
+        type: string
+      movie:
+        $ref: '#/definitions/Movie'
+      room:
+        $ref: '#/definitions/Room'
+      startTime:
+        type: string
+        format: date-time
+
+  Reservation:
+    type: object
+    properties:
+      session:
+        $ref: '#/definitions/Session'
+      seatNumber:
+        type: integer
+
+  ReservationResponse:
+    type: object
+    properties:
+      id:
+        type: string
+      session:
+        $ref: '#/definitions/Session'
+      seatNumber:
+        type: integer
+      user:
+        $ref: '#/definitions/UserResponse'
