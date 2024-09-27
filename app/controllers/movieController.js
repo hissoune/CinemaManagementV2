@@ -8,7 +8,10 @@ exports.createMovie = async (req, res) => {
   try {
     const userId = req.user.id;
     const movieData = req.body;
-    const savedMovie = await movieService.createMovie(userId, movieData);
+        
+    const posterImage = req.file ? req.file.path : null;
+
+    const savedMovie = await movieService.createMovie(userId, movieData,posterImage);
     res.status(201).json(savedMovie);
   } catch (err) {
     res.status(500).json({ msg: err.message });

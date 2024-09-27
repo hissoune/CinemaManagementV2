@@ -3,6 +3,7 @@ const connectDB = require('./app/config/db');
 require('dotenv').config();
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./app/utils/swagger-spec');
+const path = require('path');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/sessions', sessionRoutes);
 
 app.use('/api/reservations', reservationRoutes);
 
+app.use('/uploads', express.static(path.join(__dirname, 'resources/images/film-cover')));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

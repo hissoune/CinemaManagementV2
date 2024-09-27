@@ -1,0 +1,27 @@
+version: '3'
+services:
+  app:
+    container_name: express-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Exposing port 3000 to the host machine
+    volumes:
+      - .:/app       # Mounting the current directory to the /app directory in the container
+      - /app/node_modules # Avoid overriding node_modules
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/cinemaGes
+    depends_on:
+      - mongo
+  
+  mongo:
+    image: mongo:6
+    container_name: mongo-db
+    ports:
+      - "27017:27017"  # Exposing MongoDB's port
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:

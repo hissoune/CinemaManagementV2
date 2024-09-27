@@ -3,7 +3,7 @@ const User = require('../models/User');
 const Session = require('../models/Session');
 
 // Create a new movie
-exports.createMovie = async (userId, movieData) => {
+exports.createMovie = async (userId, movieData,posterImage) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
     throw new Error('User not found');
@@ -13,9 +13,9 @@ exports.createMovie = async (userId, movieData) => {
   if (!title || !description || !genre || !rating || !duration) {
     throw new Error('Please provide all required fields');
   }
-
   const newMovie = new Movie({
     ...movieData,
+    posterImage: posterImage,
     creator: userId,
   });
 
@@ -28,7 +28,18 @@ exports.getMovies = async (userId) => {
  new Error('User not found');
   }
   
-  return await Movie.find({ creator: userExists._id });
+   const movies = await Movie.find({ creator: userExists._id });
+
+  const basePath = 'http://localhost:3000/uploads/'; 
+
+  const moviesWithFullImagePath = movies.map(movie => ({
+    ...movie._doc,
+    posterImage: movie.posterImage
+      ? `${basePath}${movie.posterImage.split(path.sep).join('/')}` 
+      : null,
+  }));
+
+  return moviesWithFullImagePath; 
 };
 
 exports.getMovieById = async (userId, movieId) => {
@@ -41,8 +52,14 @@ exports.getMovieById = async (userId, movieId) => {
   if (!movie) {
     throw new Error('Movie not found');
   }
+  const movieWithFullImagePath = {
+      ...movie._doc,
+      posterImage: movie.posterImage
+        ? `http://localhost:3000/uploads/${movie.posterImage.split(path.sep).join('/')}` // Use forward slashes for URL
+        : null,
+    };
 
-  return movie;
+  return movieWithFullImagePath;
 };
 
 exports.updateMovie = async (userId, movieId, updateData) => {
@@ -56,9 +73,11 @@ exports.updateMovie = async (userId, movieId, updateData) => {
     throw new Error('Movie not found');
   }
 
-  Object.assign(movie, updateData); 
+  Object.assign(movie, updateData);
+
   return await movie.save();
 };
+
 
 exports.deleteMovie = async (userId, movieId) => {
   const movie = await Movie.findOne({ _id: movieId, creator: userId });

@@ -12,7 +12,7 @@ const MovieSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
- genre: {
+  genre: {
     type: [String],  
     required: true,  
   },
@@ -29,13 +29,18 @@ const MovieSchema = new mongoose.Schema({
     min: 0,
     max: 10,
   },
-   isDeleted: {
+  posterImage: {
+    type: String,  // Path to the uploaded image file
+  },
+  isDeleted: {
     type: Boolean,
     default: false,
   }
 }, { timestamps: true });
+
 MovieSchema.pre(/^find/, function (next) {
   this.where({ isDeleted: false });
   next();
 });
+
 module.exports = mongoose.model('Movie', MovieSchema);
