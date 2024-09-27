@@ -2,6 +2,10 @@ const jwt = require('jsonwebtoken');
 const Blacklist = require('../models/Blacklist'); 
 
 const verifyToken = async (req, res, next) => {
+  if (req.path.startsWith('/api/auth/login')) {
+    next();
+    return;
+  }
   const authHeader = req.header('Authorization');
 
   if (!authHeader) {

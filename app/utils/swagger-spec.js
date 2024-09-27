@@ -12,7 +12,7 @@ description: "This API provides functionality for managing a cinema. It includes
   },
   servers: [
     {
-      url: "http://localhost:3000",
+      url: "http://localhost:3000/api/",
     },
   ],
 };

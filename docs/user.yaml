@@ -8,9 +8,118 @@ info:
   contact:
     name: Khalid Hissoune
   servers:
-    - url: http://localhost:3000
+    - url: "http://localhost:3000/api/"
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          format: password
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/UserResponse"
+    Register:
+      type: object
+      properties:
+        name:
+          type: string
+        email:  
+          type: string
+        password:
+          type: string   
+    RegisterResponse:
+      type: object  
+      properties:
+        user:
+          $ref: "#/components/schemas/UserResponse"         
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+          format: password
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+    Movie:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        genre:
+          type: string
+        releaseDate:
+          type: string
+          format: date
+    Room:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        seats:
+          type: array
+          items:
+            type: integer
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+        movie:
+          $ref: "#/components/schemas/Movie"
+        room:
+          $ref: "#/components/schemas/Room"
+        startTime:
+          type: string
+          format: date-time
+    Reservation:
+      type: object
+      properties:
+        session:
+          $ref: "#/components/schemas/Session"
+        seatNumber:
+          type: integer
+    ReservationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        session:
+          $ref: "#/components/schemas/Session"
+        seatNumber:
+          type: integer
+        user:
+          $ref: "#/components/schemas/UserResponse"
+
 paths:
-  /auth/login:
+  "/auth/login":
     post:
       tags:
         - Auth
@@ -21,39 +130,63 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/Login'
+              $ref: "#/components/schemas/Login"
       responses:
         200:
           description: User successfully logged in
           content:
             application/json:
               schema:
-                $ref: '#/definitions/AuthResponse'
+                $ref: "#/components/schemas/AuthResponse"
         400:
           description: Invalid login credentials
-          
-  /users/:
+      security: []  # No authentication needed for login
+
+  "/auth/register":
     post:
       tags:
-        - User
-      summary: Create a new user
+        - Auth
+      summary: Create user
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/definitions/User'
+              $ref: "#/components/schemas/Register"
+      responses:
+        200:
+          description: User successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+        400:
+          description: Error
+
+  "/admins/":
+    post:
+      tags:
+        - User
+      summary: Create a new user 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
       responses:
         201:
           description: User created successfully
           content:
             application/json:
               schema:
-                $ref: '#/definitions/UserResponse'
+                $ref: "#/components/schemas/UserResponse"
         400:
           description: Invalid input data
+      security:
+        - BearerAuth: []  # Requires authentication
 
-  /movies/:
+  "/movies/":
     get:
       tags:
         - Movies
@@ -66,9 +199,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/Movie'
+                  $ref: "#/components/schemas/Movie"
+      security:
+        - BearerAuth: []  # Requires authentication            
 
-  /rooms/:
+  "/rooms/":
     get:
       tags:
         - Rooms
@@ -81,9 +216,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/Room'
+                  $ref: "#/components/schemas/Room"
+      security:
+        - BearerAuth: []  # Requires authentication                  
 
-  /sessions/:
+  "/sessions/":
     get:
       tags:
         - Sessions
@@ -96,9 +233,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/definitions/Session'
+                  $ref: "#/components/schemas/Session"
+      security:
+        - BearerAuth: []  # Requires authentication                  
 
-  /reservations/:
+  "/reservations/":
     post:
       tags:
         - Reservations
@@ -108,110 +247,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/definitions/Reservation'
+              $ref: "#/components/schemas/Reservation"
+             
       responses:
         201:
           description: Reservation made successfully
           content:
             application/json:
               schema:
-                $ref: '#/definitions/ReservationResponse'
+                $ref: "#/components/schemas/ReservationResponse"
         400:
           description: Invalid reservation data
-
-definitions:
-  Login:
-    type: object
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-        format: password
-
-  AuthResponse:
-    type: object
-    properties:
-      token:
-        type: string
-      user:
-        $ref: '#/definitions/UserResponse'
-
-  User:
-    type: object
-    properties:
-      username:
-        type: string
-      email:
-        type: string
-      password:
-        type: string
-        format: password
-
-  UserResponse:
-    type: object
-    properties:
-      id:
-        type: string
-      username:
-        type: string
-      email:
-        type: string
-
-  Movie:
-    type: object
-    properties:
-      id:
-        type: string
-      title:
-        type: string
-      genre:
-        type: string
-      releaseDate:
-        type: string
-        format: date
-
-  Room:
-    type: object
-    properties:
-      id:
-        type: string
-      name:
-        type: string
-      seats:
-        type: array
-        items:
-          type: integer
-
-  Session:
-    type: object
-    properties:
-      id:
-        type: string
-      movie:
-        $ref: '#/definitions/Movie'
-      room:
-        $ref: '#/definitions/Room'
-      startTime:
-        type: string
-        format: date-time
-
-  Reservation:
-    type: object
-    properties:
-      session:
-        $ref: '#/definitions/Session'
-      seatNumber:
-        type: integer
-
-  ReservationResponse:
-    type: object
-    properties:
-      id:
-        type: string
-      session:
-        $ref: '#/definitions/Session'
-      seatNumber:
-        type: integer
-      user:
-        $ref: '#/definitions/UserResponse'
+      security:
+        - BearerAuth: []  # Requires authentication
