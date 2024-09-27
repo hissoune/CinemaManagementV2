@@ -1,8 +1,9 @@
 const express = require('express');
 const connectDB = require('./app/config/db');
 require('dotenv').config();
-const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./app/utils/swagger-spec');
+
 const app = express();
 
 app.use(express.json());
@@ -20,27 +21,6 @@ const reservationRoutes = require('./app/routes/reservationRoutes');
 
 app.use('/api/auth', authRoutes);
 
-const swaggerDefinition = {
-  openapi: "3.0.0",
-  info: {
-    title: "Cinema management",
-    version: "0.1.0",
-description: "This API provides functionality for managing a cinema. It includes endpoints for managing movies, bookings, showtimes, rooms, and user roles (admin and client). It supports operations like creating, updating, and deleting data related to these resources, as well as user authentication and seat reservation for movie sessions.",
-    contact: {
-      name: "KHALID HISSOUNE",
-    },
-  },
-  servers: [
-    {
-      url: "http://localhost:3000",
-    },
-  ],
-};
-const options = {
-  swaggerDefinition,
-  apis: ['./docs/**/*.yaml'],
-};
-const swaggerSpec = swaggerJSDoc(options);
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 
