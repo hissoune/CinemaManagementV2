@@ -24,7 +24,7 @@ exports.getAllRooms = async (userId) => {
     throw new Error('User not found');
   }
 
-  return await Room.find({ creator: userId });
+  return await Room.find({ creator: userId }).populate('creator');
 };
 
 exports.getRoomById = async (roomId, userId) => {
@@ -33,7 +33,7 @@ exports.getRoomById = async (roomId, userId) => {
     throw new Error('User not found');
   }
 
-  const room = await Room.findOne({ _id: roomId, creator: userId });
+  const room = await Room.findOne({ _id: roomId, creator: userId }).populate('creator');
   if (!room) {
     throw new Error('Room not found');
   }
@@ -47,7 +47,7 @@ exports.updateRoom = async (roomId, userId, updateData) => {
     throw new Error('Room not found or you are not the creator');
   }
 
-  const updatedRoom = await Room.findByIdAndUpdate(roomId, updateData, { new: true });
+  const updatedRoom = await Room.findByIdAndUpdate(roomId, updateData, { new: true }).populate('creator');
   return updatedRoom;
 };
 

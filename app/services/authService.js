@@ -63,3 +63,13 @@ exports.resetPassword = async (token, newPassword) => {
     throw new Error('User not found');
   }
 };
+exports.Profile = async (token) => {
+   
+
+   const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const userId = decoded.user.id;
+
+  const user = await User.findById(userId);
+  
+  return user;
+}

@@ -1,13 +1,18 @@
 const sessionService = require('../services/sessionService');
 const sessionValidation = require('../utils/validations/sessionValidation');
 exports.createSession = async (req, res) => {
-   const { error } = sessionValidation.validatSession(req.body);
+  const { error } = sessionValidation.validatSession(req.body);
   if (error) {
-   return  res.status(400).json(error.details[0].message)
+    return res.status(400).json(error.details[0].message);
   }
+
   try {
     const { movie, room, dateTime, price } = req.body;
-    const newSession = await sessionService.createSession(movie, room, dateTime, price);
+    
+    const creator = req.user.id; 
+
+    const newSession = await sessionService.createSession(movie, room, dateTime, price, creator);
+    
     res.status(201).json(newSession);
   } catch (err) {
     res.status(500).json({ msg: err.message });

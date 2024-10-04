@@ -1,18 +1,16 @@
 const authService = require('../services/authService');
 
-exports.login = async (req, res) => {
+exports.login =  (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ msg: 'Please provide email and password' });
   }
 
-  try {
-    const token = await authService.login(email, password);
-    res.json({ token });
-  } catch (err) {
-    res.status(400).json({ msg: err.message });
-  }
+  authService.login(email, password).then((token) => {
+    res.json({ token })
+  });
+ 
 };
 exports.register = async (req, res) => {
   const { name, email, password, role } = req.body;
@@ -59,3 +57,22 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+
+
+exports.profile = (req, res) => {
+  const authHeader = req.headers['authorization']; 
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  authService.Profile(token)
+    .then((user) => {
+      res.status(200).json(user);
+    })
+    .catch((err) => {
+      res.status(500).json({ message: 'Error fetching profile', error: err.message });
+    });
+};
+
