@@ -1,6 +1,7 @@
 const Movie = require('../models/Movie');
 const User = require('../models/User');
 const Session = require('../models/Session');
+const path = require('path');
 
 // Create a new movie
 exports.createMovie = async (userId, movieData,posterImage) => {
