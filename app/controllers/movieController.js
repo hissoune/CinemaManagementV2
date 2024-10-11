@@ -2,6 +2,7 @@ const path = require('path');
 const movieService = require('../services/movieService');
 const movieValidation = require('../utils/validations/movieValidation');
 
+// Create a new movie
 exports.createMovie = async (req, res) => {
   const { error } = movieValidation.validateMovie(req.body);
   if (error) {
@@ -11,7 +12,8 @@ exports.createMovie = async (req, res) => {
     const userId = req.user.id;
     const movieData = req.body;
 
-    const posterImage = req.file ? path.join('uploads', req.file.filename) : null;
+    // Use the uploads directory directly
+    const posterImage = req.file ? req.file.filename : null;
 
     const savedMovie = await movieService.createMovie(userId, movieData, posterImage);
     res.status(201).json(savedMovie);
@@ -57,8 +59,8 @@ exports.updateMovie = async (req, res) => {
     const movieId = req.params.id;
     const updateData = req.body;
 
-    const posterImage = req.file ? path.join('uploads', req.file.filename) : null;
-    const updatedMovie = await movieService.updateMovie(userId, movieId, updateData, posterImage);
+    const posterImage = req.file ? req.file.filename : null; // Updated to reflect the new structure
+    const updatedMovie = await movieService.updateMovie(userId, movieId, { ...updateData, posterImage });
 
     if (!updatedMovie) {
       return res.status(404).json({ msg: 'Movie not found' });
@@ -83,3 +85,21 @@ exports.deleteMovie = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+exports.getmoviesPublic = async(req, res) => {
+  try {
+   
+    const movies = await movieService.getmoviesPublic();
+    res.status(200).json(movies);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+}
+exports.getmoviePublicById = async (req, res) => {
+  const id = req.params.id;
+  try {
+        const movie = await movieService.getmoviePublicById(id);
+        res.status(200).json(movie);
+  } catch (error) {
+     res.status(500).json({ msg: err.message });
+  }
+}

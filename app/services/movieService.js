@@ -4,7 +4,7 @@ const Session = require('../models/Session');
 const path = require('path');
 
 // Create a new movie
-exports.createMovie = async (userId, movieData,posterImage) => {
+exports.createMovie = async (userId, movieData, posterImage) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
     throw new Error('User not found');
@@ -14,6 +14,7 @@ exports.createMovie = async (userId, movieData,posterImage) => {
   if (!title || !description || !genre || !rating || !duration) {
     throw new Error('Please provide all required fields');
   }
+
   const newMovie = new Movie({
     ...movieData,
     posterImage: posterImage,
@@ -26,11 +27,10 @@ exports.createMovie = async (userId, movieData,posterImage) => {
 exports.getMovies = async (userId) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
- new Error('User not found');
+    throw new Error('User not found');
   }
-  
-   const movies = await Movie.find({ creator: userExists._id });
 
+  const movies = await Movie.find({ creator: userExists._id });
   const basePath = 'http://localhost:3000/uploads/'; 
 
   const moviesWithFullImagePath = movies.map(movie => ({
@@ -53,12 +53,13 @@ exports.getMovieById = async (userId, movieId) => {
   if (!movie) {
     throw new Error('Movie not found');
   }
+
   const movieWithFullImagePath = {
-      ...movie._doc,
-      posterImage: movie.posterImage
-        ? `http://localhost:3000/uploads/${movie.posterImage.split(path.sep).join('/')}` // Use forward slashes for URL
-        : null,
-    };
+    ...movie._doc,
+    posterImage: movie.posterImage
+      ? `http://localhost:3000/uploads/${movie.posterImage.split(path.sep).join('/')}` 
+      : null,
+  };
 
   return movieWithFullImagePath;
 };
@@ -75,22 +76,52 @@ exports.updateMovie = async (userId, movieId, updateData) => {
   }
 
   Object.assign(movie, updateData);
-
   return await movie.save();
 };
-
 
 exports.deleteMovie = async (userId, movieId) => {
   const movie = await Movie.findOne({ _id: movieId, creator: userId });
   if (!movie) {
     throw new Error('Movie not found or you are not the creator');
   }
-   const session = await Session.find({ movie: movieId});
-  if (session.length>0) {
-        throw new Error('Movie have a Session');
-
+  
+  const session = await Session.find({ movie: movieId });
+  if (session.length > 0) {
+    throw new Error('Movie has a Session');
   }
 
-  await Movie.findByIdAndUpdate(movieId,{isDeleted:true});
+  await Movie.findByIdAndUpdate(movieId, { isDeleted: true });
   return { msg: 'Movie deleted successfully' };
 };
+
+exports.getmoviesPublic = async () => {
+    const movies = await Movie.find();
+  const basePath = 'http://localhost:3000/uploads/'; 
+
+  const moviesWithFullImagePath = movies.map(movie => ({
+    ...movie._doc,
+    posterImage: movie.posterImage
+      ? `${basePath}${movie.posterImage.split(path.sep).join('/')}` 
+      : null,
+  }));
+
+  return moviesWithFullImagePath; 
+}
+
+exports.getmoviePublicById = async (id) => {
+  const movie = await Movie.findById(id);
+   if (!movie) {
+    return null;
+  }
+  const basePath = 'http://localhost:3000/uploads/'; 
+  
+   const movieWithFullImagePath = {
+    ...movie._doc,
+    posterImage: movie.posterImage
+      ? `${basePath}${movie.posterImage.split(path.sep).join('/')}`
+      : null,
+  };
+
+  return movieWithFullImagePath; 
+
+}

@@ -24,10 +24,27 @@ exports.login = async (email, password) => {
   return token;
 };
 exports.register = async (data) => {
-     const { name, email, password,role } = data;
-         const newUser = new User({ name, email, password ,role});
-    return await newUser.save();
-}
+    const { name, email, password, role } = data;
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        throw new Error('User already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({ name, email, password: hashedPassword, role });
+    await newUser.save();
+
+    const payload = { user: { id: newUser._id, role: newUser.role } };
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1000h' });
+
+    return token;
+};
+
+
+
+
 exports.logout = async (token) => {
   const decoded = jwt.decode(token);
   

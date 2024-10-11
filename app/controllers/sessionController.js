@@ -22,9 +22,8 @@ exports.createSession = async (req, res) => {
 
 exports.getAllSessions = async (req, res) => {
   try {
-    const userId = req.user.id;
 
-    const sessions = await sessionService.getAllSessions(userId);
+    const sessions = await sessionService.getAllSessions();
     
     res.status(200).json(sessions);
   } catch (err) {
@@ -75,3 +74,29 @@ exports.deleteSession = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+
+
+exports.getSessionsPublic = async (req, res) => {
+  
+  try {
+
+    const sessions = await sessionService.getAllSessionsPublic();
+    
+    res.status(200).json(sessions);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+}
+
+exports.getSessionsForMovie =async (req, res) => {
+  const moviId = req.params.id;
+   try {
+
+     const sessions = await sessionService.getSessionsForMovie(moviId);
+     res.status(200).json(sessions);
+    
+   
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+}

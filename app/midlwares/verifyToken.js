@@ -1,10 +1,13 @@
 const jwt = require('jsonwebtoken');
 const Blacklist = require('../models/Blacklist'); 
-const publicRoutes = ['/api/auth/login', '/api/auth/register'];
+const publicRoutes = ['/api/auth/login', '/api/auth/register','api/sessions/public','/uploads'];
 
 const verifyToken = async (req, res, next) => {
+  
   if (publicRoutes.includes(req.path)) {
+
     return next(); 
+   
   }
   const authHeader = req.header('Authorization');
 
@@ -19,10 +22,10 @@ const verifyToken = async (req, res, next) => {
   }
 
   try {
-    const isBlacklisted = await Blacklist.findOne({ token });
-    if (isBlacklisted) {
-      return res.status(401).json({ msg: 'Token is invalid. Please log in again.' });
-    }
+    // const isBlacklisted = await Blacklist.findOne({ token });
+    // if (isBlacklisted) {
+    //   return res.status(401).json({ msg: 'Token is invalid. Please log in again.' });
+    // }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded.user; 

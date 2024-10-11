@@ -19,13 +19,20 @@ const SessionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-   isDeleted: {
+  isDeleted: {
     type: Boolean,
     default: false,
-  }
+  },
+  creator: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', 
+    required: true,
+  },
 }, { timestamps: true });
+
 SessionSchema.pre(/^find/, function (next) {
   this.where({ isDeleted: false });
   next();
 });
-module.exports = mongoose.model('Session', SessionSchema); 
+
+module.exports = mongoose.model('Session', SessionSchema);

@@ -41,12 +41,26 @@ exports.createReservation = async (userId, sessionId, seat) => {
 };
 
 exports.getAllReservations = async (userId) => {
-  return await Reservation.find({user:userId}).populate('user').populate('session');
+  return await Reservation.find({user:userId}).populate('user') 
+    .populate({
+        path: 'session', 
+        populate: [
+            { path: 'room' }, 
+            { path: 'movie' } 
+        ]
+    });
 };
 
 exports.getReservationById = async (reservationId) => {
-  const reservation = await Reservation.findById(reservationId).populate('user').populate('session');
-  if (!reservation) {
+const reservation = await Reservation.findById(reservationId)
+    .populate('user') 
+    .populate({
+        path: 'session', 
+        populate: [
+            { path: 'room' }, 
+            { path: 'movie' } 
+        ]
+    });  if (!reservation) {
     throw new Error('Reservation not found');
   }
   return reservation;
@@ -134,7 +148,7 @@ exports.confirmeReservation = async (reservId, userId) => {
   {new: true},
 )
       await mailer.sendTiketMail(userExists,confirmedReservation, session,room, movie); 
-  return await confirmedReservation;
+  return  confirmedReservation;
 
 }
 
