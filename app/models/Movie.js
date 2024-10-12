@@ -22,15 +22,33 @@ const MovieSchema = new mongoose.Schema({
   creator: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
-    required:true
+    required: true,
   },
-  rating: {
+  averageRating: {
     type: Number,
-    min: 0,
-    max: 10,
-  },
+    default: 0, 
+  }, 
+  ratingCount: {
+    type: Number,
+    default: 0, 
+  }, 
   posterImage: {
-    type: String,  // Path to the uploaded image file
+    type: String,  
+  },
+  videoUrl: {
+    type: String,  
+    required: true,
+  },
+  isPublic: {
+    type: Boolean,
+    default: true, 
+  },
+  isScheduled: {
+    type: Boolean,
+    default: false, 
+  },
+  scheduleDate: {
+    type: Date,
   },
   isDeleted: {
     type: Boolean,
