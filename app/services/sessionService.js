@@ -66,12 +66,10 @@ exports.updateSession = async (sessionId, movieId, roomId, dateTime, price, user
     throw new Error('Session not found');
   }
 
-  // Only the session's creator can update it
   if (session.creator.toString() !== userId) {
     throw new Error('You are not authorized to update this session');
   }
 
-  // Update the session
   const updatedSession = await Session.findByIdAndUpdate(
     sessionId,
     { movie: movieId, room: roomId, dateTime, price },
@@ -79,27 +77,25 @@ exports.updateSession = async (sessionId, movieId, roomId, dateTime, price, user
   )
     .populate({
       path: 'movie',
-      populate: { path: 'creator', select: 'name email' } // Populating movie's creator details
+      populate: { path: 'creator', select: 'name email' }
     })
     .populate({
       path: 'room',
-      populate: { path: 'creator', select: 'name email' } // Populating room's creator details
+      populate: { path: 'creator', select: 'name email' } 
     })
-    .populate('creator', 'name email') // Populate session's creator
+    .populate('creator', 'name email') 
     .exec();
 
   return updatedSession;
 };
 
 exports.deleteSession = async (sessionId, userId) => {
-  // Check if there are any reservations for this session
   const reservations = await Reservation.find({ session: sessionId });
   
   if (reservations.length > 0) {
     throw new Error('Cannot delete a session with reservations');
   }
 
-  // Find the session and populate its room
   const session = await Session.findById(sessionId)
     .populate({
       path: 'room',
@@ -111,33 +107,34 @@ exports.deleteSession = async (sessionId, userId) => {
     throw new Error('Session not found');
   }
 
-  // Only the session creator can delete it
   if (session.creator.toString() !== userId) {
     throw new Error('You are not authorized to delete this session');
   }
 
-  // Soft delete the session by marking it as isDeleted
   session.isDeleted = true;
   await session.save();
 
   return { msg: 'Session deleted successfully' };
 };
 
-exports.getAllSessionsPublic = async() => {
-   const sessions = await Session.find()
+exports.getAllSessionsPublic = async () => {
+  const currentDate = new Date();  
+
+  const sessions = await Session.find({ dateTime: { $gte: currentDate } })
     .populate({
       path: 'movie',
-      populate: { path: 'creator', select: 'name email' } 
+      populate: { path: 'creator', select: 'name email' }
     })
     .populate({
       path: 'room',
-      populate: { path: 'creator', select: 'name email' } 
+      populate: { path: 'creator', select: 'name email' }
     })
-    .populate('creator', 'name email') 
+    .populate('creator', 'name email')
     .exec();
 
   return sessions;
-}
+};
+
 exports.getSessionsForMovie = async (moviId) => {
 
   

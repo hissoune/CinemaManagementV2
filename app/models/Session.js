@@ -11,6 +11,16 @@ const SessionSchema = new mongoose.Schema({
     ref: 'Room',
     required: true,
   },
+  seats: [{
+    number: {
+      type: Number,
+      required: true
+    },
+    available: {
+      type: Boolean,
+      default: true 
+    }
+  }],
   dateTime: {
     type: Date,
     required: true,
