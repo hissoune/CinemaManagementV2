@@ -11,16 +11,25 @@ exports.createSession = async (movieId, roomId, dateTime, price, creator) => {
     throw new Error('Movie or Room not found');
   }
 
+  const roomCapacity = roomExists.capacity;
+
+  const seats = [];
+  for (let i = 1; i <= roomCapacity; i++) {
+    seats.push({ number: i, available: true });
+  }
+
   const newSession = new Session({
     movie: movieId,
     room: roomId,
     dateTime,
     price,
-    creator, 
+    seats, 
+    creator,
   });
 
   return await newSession.save();
 };
+
 
 exports.getAllSessions = async () => {
   const sessions = await Session.find()

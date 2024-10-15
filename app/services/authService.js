@@ -5,26 +5,53 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Blacklist = require('../models/Blacklist');
 const mailer = require('../utils/mailer');
+const path = require('path');
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
-exports.login = async (email, password) => {
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw new Error('User not found');
-  }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+
+
+
+
+
+exports.login = async (email, password) => {
+ 
+  
+  const userexist = await User.findOne({ email});
+  if (!userexist) {
+    throw new  Error('User not found');
+  }
+ 
+  
+
+  const isMatch =  bcrypt.compare(password, userexist.password);
+
+  
   if (!isMatch) {
     throw new Error('Invalid credentials');
   }
 
-  const payload = { user: { id: user._id, role: user.role } };
+  const payload = { user: { id: userexist._id, role: userexist.role } };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1000h' });
-
-  return token;
+  const basePath = 'http://localhost:3000/uploads/'; 
+  const user = {
+    ...userexist._doc,
+    image: userexist.image
+      ? `${basePath}${userexist.image.split(path.sep).join('/')}`
+      : null,
+  };
+  return {token,user};
 };
+
+
+
+
+
+
+
 exports.register = async (data) => {
-    const { name, email, password, role } = data;
+    const { name, email, password, role,image } = data;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -33,13 +60,21 @@ exports.register = async (data) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ name, email, password: hashedPassword, role });
+    const newUser = new User({ name, email, password: hashedPassword, role ,image:image});
     await newUser.save();
 
     const payload = { user: { id: newUser._id, role: newUser.role } };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1000h' });
 
-    return token;
+
+    const basePath = 'http://localhost:3000/uploads/'; 
+    const user = {
+      ...newUser._doc,
+      image: newUser.image
+        ? `${basePath}${newUser.image.split(path.sep).join('/')}`
+        : null,
+    };
+    return {token,user};
 };
 
 
@@ -80,13 +115,26 @@ exports.resetPassword = async (token, newPassword) => {
     throw new Error('User not found');
   }
 };
+
+
+
+
+
+
+
 exports.Profile = async (token) => {
    
 
    const decoded = jwt.verify(token, process.env.JWT_SECRET);
   const userId = decoded.user.id;
 
-  const user = await User.findById(userId);
-  
+  const userByid = await User.findById(userId);
+  const basePath = 'http://localhost:3000/uploads/'; 
+  const user = {
+    ...userByid._doc,
+    image: userByid.image
+      ? `${basePath}${userByid.image.split(path.sep).join('/')}`
+      : null,
+  };
   return user;
 }

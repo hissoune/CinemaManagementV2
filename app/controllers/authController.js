@@ -4,23 +4,34 @@ exports.login =  (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ msg: 'Please provide email and password' });
+      return res.status(400).json({ msg: 'Please provide email and password' });
   }
 
-  authService.login(email, password).then((token) => {
-    res.json({ token })
-  });
+  authService.login(email, password).then((response) => {  
+          res.json(response);
+      })
+      .catch(err => {
+       
+        
+          res.status(500).json({ msg: err.message }); 
+      });
+     
  
 };
+
+
+
+
 exports.register = async (req, res) => {
   const { name, email, password } = req.body;
 
-  try {
-    const token = await authService.register({ name, email, password });
-    res.status(200).json({ token }); // Send the token inside an object
-  } catch (error) {
-    res.status(400).json({ msg: error.message });
-  }
+   const image = req.file ? req.file.filename : null;
+  authService.register({ name, email, password ,image}).then(({ token, user }) => {  
+    res.json({ token, user });
+})
+.catch(err => {
+    res.status(500).json({ msg: err.message }); 
+});
 };
 
 exports.logout = async (req, res) => {

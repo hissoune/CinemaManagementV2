@@ -10,8 +10,8 @@ exports.createMovie = async (userId, movieData, posterImage) => {
     throw new Error('User not found');
   }
 
-  const { title, description, releaseDate, genre, duration, rating } = movieData;
-  if (!title || !description || !genre || !rating || !duration) {
+  const { title, description, releaseDate, genre, duration } = movieData;
+  if (!title || !description || !genre || !duration) {
     throw new Error('Please provide all required fields');
   }
 

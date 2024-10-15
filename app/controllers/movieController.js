@@ -2,17 +2,15 @@ const path = require('path');
 const movieService = require('../services/movieService');
 const movieValidation = require('../utils/validations/movieValidation');
 
-// Create a new movie
 exports.createMovie = async (req, res) => {
-  const { error } = movieValidation.validateMovie(req.body);
-  if (error) {
-    return res.status(400).json({ msg: error.details[0].message });
-  }
+  // const { error } = movieValidation.validateMovie(req.body);
+  // if (error) {
+  //   return res.status(400).json({ msg: error.details[0].message });
+  // }
   try {
     const userId = req.user.id;
     const movieData = req.body;
 
-    // Use the uploads directory directly
     const posterImage = req.file ? req.file.filename : null;
 
     const savedMovie = await movieService.createMovie(userId, movieData, posterImage);

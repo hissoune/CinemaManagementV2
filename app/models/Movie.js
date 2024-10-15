@@ -37,7 +37,7 @@ const MovieSchema = new mongoose.Schema({
   },
   videoUrl: {
     type: String,  
-    required: true,
+   
   },
   isPublic: {
     type: Boolean,
