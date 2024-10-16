@@ -9,6 +9,7 @@ const movieSchema = Joi.object({
   
   genre: Joi.string().valid('Action', 'Drama', 'Comedy', 'Horror', 'Sci-Fi').required(),
     duration: Joi.number().min(1).max(5).required(),
+    movieId:Joi.string(),
 });
 
  exports.validateMovie = (movieData) => {

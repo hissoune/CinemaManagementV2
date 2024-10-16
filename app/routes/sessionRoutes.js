@@ -4,7 +4,7 @@ const sessionController = require('../controllers/sessionController');
 
 router.post('/create', sessionController.createSession);
 
-router.get('/public', sessionController.getAllSessions);
+router.get('/', sessionController.getAllSessions);
 
 router.get('/:id', sessionController.getSessionById);
 

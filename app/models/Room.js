@@ -1,3 +1,4 @@
+const { string, required } = require('joi');
 const mongoose = require('mongoose');
 
 const RoomSchema = new mongoose.Schema({
@@ -14,6 +15,10 @@ const RoomSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: 'User',
     required: true
+  },
+  location: {
+    type: String,
+    required: true,
   },
    isDeleted: {
     type: Boolean,

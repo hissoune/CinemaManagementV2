@@ -48,7 +48,6 @@ exports.getAllSessions = async () => {
 };
 
 exports.getSessionById = async (sessionId) => {
-  // Fetch session by ID and populate movie, room, and creator details
   const session = await Session.findById(sessionId)
     .populate({
       path: 'movie',

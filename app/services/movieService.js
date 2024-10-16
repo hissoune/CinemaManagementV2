@@ -25,12 +25,17 @@ exports.createMovie = async (userId, movieData, posterImage) => {
 };
 
 exports.getMovies = async (userId) => {
+
   const userExists = await User.findById(userId);
+
+  
   if (!userExists) {
     throw new Error('User not found');
   }
 
-  const movies = await Movie.find({ creator: userExists._id });
+  const movies = await Movie.find({creator:userId});
+
+  
   const basePath = 'http://localhost:3000/uploads/'; 
 
   const moviesWithFullImagePath = movies.map(movie => ({

@@ -1,6 +1,7 @@
 const path = require('path');
 const movieService = require('../services/movieService');
 const movieValidation = require('../utils/validations/movieValidation');
+const { log } = require('console');
 
 exports.createMovie = async (req, res) => {
   // const { error } = movieValidation.validateMovie(req.body);
@@ -20,18 +21,22 @@ exports.createMovie = async (req, res) => {
   }
 };
 
-// Get all movies created by the logged-in user
 exports.getMovies = async (req, res) => {
+  
+  
   try {
     const userId = req.user.id;
+  
+    
     const movies = await movieService.getMovies(userId);
+ 
+    
     res.status(200).json(movies);
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
 };
 
-// Get a specific movie by ID
 exports.getMovieById = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -46,17 +51,21 @@ exports.getMovieById = async (req, res) => {
   }
 };
 
-// Update a movie
 exports.updateMovie = async (req, res) => {
+
+  
   const { error } = movieValidation.validateMovie(req.body);
   if (error) {
+    
+    
     return res.status(400).json({ msg: error.details[0].message });
   }
+  console.log(req.user.id);
   try {
     const userId = req.user.id;
     const movieId = req.params.id;
     const updateData = req.body;
-
+    
     const posterImage = req.file ? req.file.filename : null; // Updated to reflect the new structure
     const updatedMovie = await movieService.updateMovie(userId, movieId, { ...updateData, posterImage });
 

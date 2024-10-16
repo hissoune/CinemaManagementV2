@@ -46,6 +46,7 @@ exports.updateRoom = async (roomId, userId, updateData) => {
   if (!room) {
     throw new Error('Room not found or you are not the creator');
   }
+console.log(updateData.location);
 
   const updatedRoom = await Room.findByIdAndUpdate(roomId, updateData, { new: true }).populate('creator');
   return updatedRoom;
