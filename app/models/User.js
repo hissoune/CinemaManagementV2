@@ -16,13 +16,17 @@ const UserSchema = new mongoose.Schema({
     required: true,
   },
   image: {
-    type: String,  
+    type: String,
   },
   role: {
     type: String,
-    enum: ['admin', 'client'], 
-    default: 'client', 
-  }
+    enum: ['admin', 'client'],
+    default: 'client',
+  },
+  favorites: [{
+    type: mongoose.Schema.ObjectId,
+    ref: 'Movie', 
+  }]
 }, { timestamps: true });
 
 UserSchema.pre('save', async function (next) {
@@ -31,6 +35,5 @@ UserSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
-
 
 module.exports = mongoose.model('User', UserSchema);
