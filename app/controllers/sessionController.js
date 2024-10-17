@@ -90,6 +90,7 @@ exports.getSessionsPublic = async (req, res) => {
 
 exports.getSessionsForMovie =async (req, res) => {
   const moviId = req.params.id;
+  
    try {
 
      const sessions = await sessionService.getSessionsForMovie(moviId);

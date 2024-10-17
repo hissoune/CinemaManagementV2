@@ -98,12 +98,14 @@ exports.updateSession = async (sessionId, movieId, roomId, dateTime, price, user
 };
 
 exports.deleteSession = async (sessionId, userId) => {
+  // Check if there are any reservations for the session
   const reservations = await Reservation.find({ session: sessionId });
   
   if (reservations.length > 0) {
     throw new Error('Cannot delete a session with reservations');
   }
 
+  // Find the session by ID and populate the necessary fields
   const session = await Session.findById(sessionId)
     .populate({
       path: 'room',
@@ -111,15 +113,24 @@ exports.deleteSession = async (sessionId, userId) => {
     })
     .populate('creator', 'name email');
 
+  // Check if the session exists
   if (!session) {
     throw new Error('Session not found');
   }
 
-  if (session.creator.toString() !== userId) {
+  // Check if the user is authorized to delete the session
+  if (session.creator._id.toString() !== userId) {
     throw new Error('You are not authorized to delete this session');
   }
 
   session.isDeleted = true;
+
+  if (session.seats && session.seats.length > 0) {
+    session.seats.forEach(seat => {
+      seat.isDeleted = true;
+    });
+  }
+
   await session.save();
 
   return { msg: 'Session deleted successfully' };
@@ -156,5 +167,6 @@ exports.getSessionsForMovie = async (moviId) => {
     })
     .populate('creator', 'name email') 
     .exec();
+    
   return sessions;
 }
