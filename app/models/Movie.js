@@ -13,11 +13,11 @@ const MovieSchema = new mongoose.Schema({
     required: true,
   },
   genre: {
-    type: [String],  
-    required: true,  
+    type: [String],
+    required: true,
   },
   duration: {
-    type: Number, 
+    type: Number,
   },
   creator: {
     type: mongoose.Schema.ObjectId,
@@ -26,26 +26,38 @@ const MovieSchema = new mongoose.Schema({
   },
   averageRating: {
     type: Number,
-    default: 0, 
-  }, 
+    default: 0,
+  },
   ratingCount: {
     type: Number,
-    default: 0, 
-  }, 
+    default: 0,
+  },
   posterImage: {
-    type: String,  
+    type: String,
   },
   videoUrl: {
-    type: String,  
-   
+    type: String,
   },
+  ratings: [{
+    userId: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max:10 
+    }
+  }],
   isPublic: {
     type: Boolean,
-    default: true, 
+    default: true,
   },
   isScheduled: {
     type: Boolean,
-    default: false, 
+    default: false,
   },
   scheduleDate: {
     type: Date,
