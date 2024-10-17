@@ -1,6 +1,6 @@
+require('dotenv').config();
 
 const express = require('express');
-require('dotenv').config();
 
 const connectDB = require('./app/config/db');
 const swaggerUi = require('swagger-ui-express');
@@ -27,12 +27,13 @@ const roomRoutes = require('./app/routes/roomRoutes');
 const sessionRoutes = require('./app/routes/sessionRoutes');
 const reservationRoutes = require('./app/routes/reservationRoutes');
 const publicRoutes = require('./app/routes/publicRoutes')
+
+app.use(verifyToken)
 app.use('/api/auth', authRoutes);
 
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/public', publicRoutes);
-app.use(verifyToken)
 
 app.use('/api/admins', adminRoutes); 
 

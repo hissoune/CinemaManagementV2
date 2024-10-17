@@ -1,4 +1,5 @@
 const authService = require('../services/authService');
+const { uploadToMinIO } = require('../services/uploadService');
 
 exports.login =  (req, res) => {
   const { email, password } = req.body;
@@ -25,8 +26,9 @@ exports.login =  (req, res) => {
 exports.register = async (req, res) => {
   const { name, email, password } = req.body;
 
-   const image = req.file ? req.file.filename : null;
-  authService.register({ name, email, password ,image}).then(({ token, user }) => {  
+  const imageFile = req.files.image; 
+  const image = await uploadToMinIO(imageFile[0]);
+    authService.register({ name, email, password ,image}).then(({ token, user }) => {  
     res.json({ token, user });
 })
 .catch(err => {
@@ -85,3 +87,35 @@ exports.profile = (req, res) => {
     });
 };
 
+
+exports.updateprofile = async (req,res)=>{
+    
+     const userId = req.user.id;
+     const updatedData = req.body;
+     const imageFile = req.files.image; 
+     const image = await uploadToMinIO(imageFile[0]);
+     authService.updateUser(userId,updatedData,image)
+     .then((user) => {
+       res.status(200).json(user);
+     })
+     .catch((err) => {
+       res.status(500).json({ message: 'Error updating profile', error: err.message });
+     });
+
+};
+exports.favorites =async (req,res)=>{
+ 
+  
+  const movieId = req.params.movieId;
+  console.log(movieId);
+  
+  const userId = req.user.id;
+  authService.favorites(movieId,userId)
+  .then((user) => {
+    res.status(200).json(user);
+  })
+  .catch((err) => {
+    res.status(500).json({ message: 'Error updating profile', error: err.message });
+  });
+
+}

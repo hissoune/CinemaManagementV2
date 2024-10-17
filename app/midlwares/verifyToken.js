@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Blacklist = require('../models/Blacklist'); 
-const publicRoutes = ['/api/auth/login', '/api/auth/register','api/sessions/public','/uploads'];
+const publicRoutes = ['/api/auth/login', '/api/auth/register','api/sessions/public','/uploads','/api-docs'];
 
 const verifyToken = async (req, res, next) => {
   
@@ -32,7 +32,7 @@ const verifyToken = async (req, res, next) => {
 
     switch (true) {
       case req.path.startsWith('/api/auth'):
-        if (token && !req.path.startsWith('/api/auth/logout')) {
+        if (token && !req.path.startsWith('/api/auth/logout')&&!req.path.startsWith('/api/auth/profile')) {
           return res.status(302).json({ msg: 'You are already logged in. Please log out first.' });
 
         }

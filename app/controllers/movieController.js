@@ -1,25 +1,39 @@
 const path = require('path');
 const movieService = require('../services/movieService');
 const movieValidation = require('../utils/validations/movieValidation');
-const { log } = require('console');
+ const {uploadToMinIO} = require('../services/uploadService')
+
+
+
 
 exports.createMovie = async (req, res) => {
+  // Validate inputs (uncomment if you want to use validation)
   // const { error } = movieValidation.validateMovie(req.body);
   // if (error) {
   //   return res.status(400).json({ msg: error.details[0].message });
   // }
+  
   try {
     const userId = req.user.id;
-    const movieData = req.body;
 
-    const posterImage = req.file ? req.file.filename : null;
+    const videoFile = req.files.videoUrl; 
+    
+    const videoUrl = await uploadToMinIO(videoFile[0]); 
 
-    const savedMovie = await movieService.createMovie(userId, movieData, posterImage);
+    const imageFile = req.files.imageUrl; 
+    const imageUrl = await uploadToMinIO(imageFile[0]);
+
+   
+    const savedMovie = await movieService.createMovie(userId, req.body, imageUrl,videoUrl);
+    
     res.status(201).json(savedMovie);
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
 };
+
+
+
 
 exports.getMovies = async (req, res) => {
   

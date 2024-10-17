@@ -4,7 +4,7 @@ const Session = require('../models/Session');
 const path = require('path');
 
 // Create a new movie
-exports.createMovie = async (userId, movieData, posterImage) => {
+exports.createMovie = async (userId, movieData, imageUrl,videoUrl) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
     throw new Error('User not found');
@@ -17,7 +17,8 @@ exports.createMovie = async (userId, movieData, posterImage) => {
 
   const newMovie = new Movie({
     ...movieData,
-    posterImage: posterImage,
+    posterImage: imageUrl,
+    videoUrl:videoUrl,
     creator: userId,
   });
 
@@ -35,17 +36,8 @@ exports.getMovies = async (userId) => {
 
   const movies = await Movie.find({creator:userId});
 
-  
-  const basePath = 'http://localhost:3000/uploads/'; 
 
-  const moviesWithFullImagePath = movies.map(movie => ({
-    ...movie._doc,
-    posterImage: movie.posterImage
-      ? `${basePath}${movie.posterImage.split(path.sep).join('/')}` 
-      : null,
-  }));
-
-  return moviesWithFullImagePath; 
+  return movies; 
 };
 
 exports.getMovieById = async (userId, movieId) => {
@@ -59,14 +51,7 @@ exports.getMovieById = async (userId, movieId) => {
     throw new Error('Movie not found');
   }
 
-  const movieWithFullImagePath = {
-    ...movie._doc,
-    posterImage: movie.posterImage
-      ? `http://localhost:3000/uploads/${movie.posterImage.split(path.sep).join('/')}` 
-      : null,
-  };
-
-  return movieWithFullImagePath;
+  return movie;
 };
 
 exports.updateMovie = async (userId, movieId, updateData) => {
@@ -80,8 +65,12 @@ exports.updateMovie = async (userId, movieId, updateData) => {
     throw new Error('Movie not found');
   }
 
-  Object.assign(movie, updateData);
-  return await movie.save();
+  const updatedMovie = await Movie.findOneAndUpdate(
+    { _id: movieId, creator: userId },  
+    updateData,                        
+    { new: true }  
+  );
+  return updatedMovie;
 };
 
 exports.deleteMovie = async (userId, movieId) => {
@@ -101,16 +90,9 @@ exports.deleteMovie = async (userId, movieId) => {
 
 exports.getmoviesPublic = async () => {
     const movies = await Movie.find();
-  const basePath = 'http://localhost:3000/uploads/'; 
 
-  const moviesWithFullImagePath = movies.map(movie => ({
-    ...movie._doc,
-    posterImage: movie.posterImage
-      ? `${basePath}${movie.posterImage.split(path.sep).join('/')}` 
-      : null,
-  }));
 
-  return moviesWithFullImagePath; 
+  return movies; 
 }
 
 exports.getmoviePublicById = async (id) => {
@@ -118,15 +100,8 @@ exports.getmoviePublicById = async (id) => {
    if (!movie) {
     return null;
   }
-  const basePath = 'http://localhost:3000/uploads/'; 
-  
-   const movieWithFullImagePath = {
-    ...movie._doc,
-    posterImage: movie.posterImage
-      ? `${basePath}${movie.posterImage.split(path.sep).join('/')}`
-      : null,
-  };
 
-  return movieWithFullImagePath; 
+
+  return movie; 
 
 }

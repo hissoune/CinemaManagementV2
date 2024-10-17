@@ -128,13 +128,62 @@ exports.Profile = async (token) => {
    const decoded = jwt.verify(token, process.env.JWT_SECRET);
   const userId = decoded.user.id;
 
-  const userByid = await User.findById(userId);
-  const basePath = 'http://localhost:3000/uploads/'; 
-  const user = {
-    ...userByid._doc,
-    image: userByid.image
-      ? `${basePath}${userByid.image.split(path.sep).join('/')}`
-      : null,
-  };
+  const user = await User.findById(userId);
+  
+
   return user;
 }
+
+
+exports.updateUser = async (userId, updatedData,image) => {
+  if (image) {
+    updatedData.image = image;
+}
+  try {
+      const updatedUser = await User.findByIdAndUpdate(
+          userId,           
+          updatedData,      
+          { new: true }    
+      );
+
+      if (!updatedUser) {
+          throw new Error('User not found');
+      }
+
+      return updatedUser; 
+  } catch (error) {
+      throw new Error(error.message || 'Failed to update user');
+  }
+};
+
+exports.favorites = async (movieId, userId) => {
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    let updateOperation;
+    if (user.favorites.includes(movieId)) {
+      updateOperation = { $pull: { favorites: movieId } };
+    } else {
+      updateOperation = { $addToSet: { favorites: movieId } };
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      updateOperation,
+      { new: true, runValidators: false } 
+    );
+
+    if (!updatedUser) {
+      throw new Error('User not found after update');
+    }
+
+    return updatedUser;
+  } catch (error) {
+    throw new Error(error.message || 'Failed to update favorites');
+  }
+};
+
