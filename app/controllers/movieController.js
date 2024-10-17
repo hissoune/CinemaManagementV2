@@ -123,4 +123,20 @@ exports.getmoviePublicById = async (req, res) => {
   } catch (error) {
      res.status(500).json({ msg: err.message });
   }
-}
+};
+
+exports.rating = async (req, res) => {
+  const { movieId, rating } = req.body;
+  const userId = req.user.id; 
+
+  if (!rating || rating < 1 || rating > 10) {
+    return res.status(400).json({ message: 'Rating must be between 1 and 10' });
+  }
+
+  try {
+    const updatedMovie = await movieService.addOrUpdateRating(movieId, userId, rating);
+    return res.status(200).json({ message: 'Rating updated successfully', movie: updatedMovie });
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating rating', error: error.message });
+  }
+};

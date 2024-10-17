@@ -104,4 +104,28 @@ exports.getmoviePublicById = async (id) => {
 
   return movie; 
 
-}
+};
+
+
+exports.addOrUpdateRating = async (movieId, userId, rating) => {
+  const movie = await Movie.findById(movieId);
+
+  if (!movie) {
+    throw new Error('Movie not found');
+  }
+
+  const existingRating = movie.ratings.find((r) => r.userId.toString() === userId);
+
+  if (existingRating) {
+    existingRating.rating = rating;
+  } else {
+    movie.ratings.push({ userId, rating });
+    movie.ratingCount += 1;
+  }
+  const totalRating = movie.ratings.reduce((acc, cur) => acc + cur.rating, 0);
+  movie.averageRating = totalRating / movie.ratings.length;
+
+  const updatedMovie = await movie.save();
+
+  return updatedMovie;
+};
