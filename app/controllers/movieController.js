@@ -17,7 +17,6 @@ exports.createMovie = async (req, res) => {
     const userId = req.user.id;
 
     const videoFile = req.files.videoUrl; 
-    
     const videoUrl = await uploadToMinIO(videoFile[0]); 
 
     const imageFile = req.files.imageUrl; 
@@ -140,3 +139,11 @@ exports.rating = async (req, res) => {
     return res.status(500).json({ message: 'Error updating rating', error: error.message });
   }
 };
+
+
+exports.getmovieRelatedPublicById = async(req,res)=>{
+  
+   
+
+
+}

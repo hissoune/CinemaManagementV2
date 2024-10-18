@@ -19,7 +19,10 @@ exports.createComment = async ({ movieId, userId, content }) => {
 exports.getCommentsByMovie = async (movieId) => {
   try {
     const comments = await Comment.find({ movie: movieId })
-      .populate('user', 'name')
+    .populate({
+        path: 'user',
+        select: 'name email image'
+      })
       .sort({ createdAt: -1 });
     
     return comments;

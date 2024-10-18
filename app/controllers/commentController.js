@@ -4,7 +4,8 @@ exports.createComment = async (req, res) => {
   try {
     const { movieId, content } = req.body; 
     const userId = req.user.id;
-
+          console.log(req.body);
+          
     if (!movieId || !content) {
       return res.status(400).json({ msg: 'Movie ID and content are required' });
     }
