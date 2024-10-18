@@ -40,13 +40,14 @@ const verifyToken = async (req, res, next) => {
 
       case req.path.startsWith('/api/admins'):
       case req.path.startsWith('/api/movies'):
+        
       case req.path.startsWith('/api/rooms'):
       case req.path.startsWith('/api/sessions'):
         if (req.user.role !== 'admin') {
           return res.status(403).json({ msg: 'Access denied: Admins only' });
         }
         break;
-
+       case req.path.startsWith('/api/movies/rating'):
       case req.path.startsWith('/api/reservations'):
         if (req.user.role !== 'client') {
           return res.status(403).json({ msg: 'Access denied: Clients only' });

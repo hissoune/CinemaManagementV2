@@ -15,10 +15,18 @@ const CommentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
   },
 }, { timestamps: true });
 
+CommentSchema.pre(/^find/, function (next) {
+  this.where({ isDeleted: false });
+  next();
+})
 module.exports = mongoose.model('Comment', CommentSchema);

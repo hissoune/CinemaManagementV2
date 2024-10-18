@@ -7,13 +7,13 @@ const router = express.Router();
 router.post('/create',upload.fields([{ name: 'imageUrl', maxCount: 1 }, { name: 'videoUrl', maxCount: 1 }]),  createMovie);
 
 
-router.get('/', getMovies);
+router.get('/movies/', getMovies);
 router.put('/rating',rating );
 
-router.get('/:id', getMovieById);
+router.get('/movies/:id', getMovieById);
 
-router.put('/update/:id',upload.single('posterImage'),   updateMovie);
+router.put('/movies/update/:id',upload.single('posterImage'),   updateMovie);
 
-router.delete('/delete/:id',  deleteMovie);
+router.delete('/movies/delete/:id',  deleteMovie);
 
 module.exports = router;

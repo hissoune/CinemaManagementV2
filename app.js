@@ -27,6 +27,7 @@ const roomRoutes = require('./app/routes/roomRoutes');
 const sessionRoutes = require('./app/routes/sessionRoutes');
 const reservationRoutes = require('./app/routes/reservationRoutes');
 const publicRoutes = require('./app/routes/publicRoutes')
+const commentsRoutes = require('./app/routes/commentRoute')
 
 app.use(verifyToken)
 app.use('/api/auth', authRoutes);
@@ -38,7 +39,8 @@ app.use('/api/public', publicRoutes);
 app.use('/api/admins', adminRoutes); 
 
 
-app.use('/api/movies', movieRoutes);
+app.use('/api/', commentsRoutes);
+app.use('/api/', movieRoutes);
 
 app.use('/api/rooms', roomRoutes);
 
