@@ -18,29 +18,23 @@ const JWT_SECRET = process.env.JWT_SECRET;
 exports.login = async (email, password) => {
  
   
-  const userexist = await User.findOne({ email});
-  if (!userexist) {
+  const user = await User.findOne({ email});
+  if (!user) {
     throw new  Error('User not found');
   }
  
   
 
-  const isMatch =  bcrypt.compare(password, userexist.password);
+  const isMatch =  bcrypt.compare(password, user.password);
 
   
   if (!isMatch) {
     throw new Error('Invalid credentials');
   }
 
-  const payload = { user: { id: userexist._id, role: userexist.role } };
+  const payload = { user: { id: user._id, role: user.role } };
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1000h' });
-  const basePath = 'http://localhost:3000/uploads/'; 
-  const user = {
-    ...userexist._doc,
-    image: userexist.image
-      ? `${basePath}${userexist.image.split(path.sep).join('/')}`
-      : null,
-  };
+ 
   return {token,user};
 };
 
@@ -60,20 +54,14 @@ exports.register = async (data) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ name, email, password: hashedPassword, role ,image:image});
-    await newUser.save();
+    const user = new User({ name, email, password: hashedPassword, role ,image:image});
+    await user.save();
 
-    const payload = { user: { id: newUser._id, role: newUser.role } };
+    const payload = { user: { id: user._id, role: user.role } };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1000h' });
 
 
-    const basePath = 'http://localhost:3000/uploads/'; 
-    const user = {
-      ...newUser._doc,
-      image: newUser.image
-        ? `${basePath}${newUser.image.split(path.sep).join('/')}`
-        : null,
-    };
+   
     return {token,user};
 };
 
