@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Blacklist = require('../models/Blacklist'); 
-const publicRoutes = ['/api/auth/login', '/api/auth/register','api/sessions/public','/uploads','/api-docs'];
+const publicRoutes = ['/api/auth/login', '/api/auth/register','api/sessions/public','api/public','/uploads','/api-docs'];
 
 const verifyToken = async (req, res, next) => {
   
