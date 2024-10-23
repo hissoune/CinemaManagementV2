@@ -1,5 +1,5 @@
 const express = require('express');
-const { createMovie, getMovies, getMovieById, updateMovie,rating, deleteMovie } = require('../controllers/movieController');
+const { createMovie, getMovies, getMovieById, updateMovie,rating, deleteMovie,getmovieRelatedPublicById } = require('../controllers/movieController');
 const upload = require('../midlwares/multerSetup');
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.get('/movies/', getMovies);
 router.put('/rating',rating );
 
 router.get('/movies/:id', getMovieById);
+router.get('/relatedMovies/:id', getmovieRelatedPublicById);
 
 router.put('/movies/update/:id',upload.single('posterImage'),   updateMovie);
 
