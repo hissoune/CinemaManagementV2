@@ -129,3 +129,30 @@ exports.addOrUpdateRating = async (movieId, userId, rating) => {
 
   return updatedMovie;
 };
+
+exports.getmovieRelatedPublicById = async (movieId) => {
+  const movie = await Movie.findById(movieId);
+  if (!movie) {
+      throw new Error('Movie not found');
+  }
+
+  const { title, releaseDate, creator, genre } = movie;
+
+  const relatedMovies = await Movie.find({
+    $or: [
+        { title: { $regex: title, $options: 'i' } }, 
+        {
+            releaseDate: {
+                $gte: new Date(releaseDate - 1 * 24 * 60 * 60 * 1000), 
+                $lte: new Date(releaseDate + 1 * 24 * 60 * 60 * 1000) 
+            }
+        }, 
+        { creator }, 
+        { genre: { $in: genre } } 
+    ],
+    _id: { $ne: movieId } 
+  }).limit(5); 
+
+  return relatedMovies;
+};
+
