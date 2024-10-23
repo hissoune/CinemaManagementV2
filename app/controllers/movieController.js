@@ -143,7 +143,16 @@ exports.rating = async (req, res) => {
 
 exports.getmovieRelatedPublicById = async(req,res)=>{
   
-   
+   const movieId = req.params.id;
+   try {
+     const RelatedMovies = await movieService.getmovieRelatedPublicById(movieId);
+
+   return res.status(200).json({ RelatedMovies });
+   } catch (error) {
+    return res.status(500).json({ message: 'cant get the related movies', error: error.message });
+
+   }
+  
 
 
 }
