@@ -5,16 +5,16 @@ jest.mock('../services/roomService');
 
 describe('roomController', () => {
     let req, res;
+
     beforeEach(() => {
         req = {
-         
             user: { id: 'testUserId' },
             body: {
-                name: "Inception",
-             
-                capacity: 22
+                name: "Room A",
+                capacity: 22,
+                location: "First Floor"
             },
-            params: { roomId: 'testMovieId' }
+            params: { id: 'roomId123' }
         };
 
         res = {
@@ -27,93 +27,93 @@ describe('roomController', () => {
                 this.data = data;
             },
         };
-
-
-
     });
 
+    test('createRoom should return status 201 and new room data', async () => {
+        const mockRoom = { id: 'roomId123', ...req.body };
+        roomService.createRoom.mockResolvedValue(mockRoom);
 
-    test('create room have to return status with 201', async () => {
-            roomService.createRoom({
-                id: "roomid",
-                ...req.body
-            });
-            await roomController.createRoom(req, res);
-            expect(res.statusCode).toBe(201);
-            // expect(res.data).toEqual({
-            //     id: 'newMovieId',
-            //     ...req.body
-            // });
+        await roomController.createRoom(req, res);
+
+        expect(res.statusCode).toBe(201);
+        expect(res.data).toEqual(mockRoom);
     });
-    
-    test('get all rooms must return status with 201', async () => {
+
+    test('getAllRooms should return status 200 and all rooms', async () => {
         const mockRooms = [
-            { id: 'room1', name: 'Inception', capacity: 12, creator: 'testUserId' },
-            { id: 'room2', name: 'The Dark Knight', capacity: 22, creator: 'testUserId' }
+            { id: 'room1', name: 'Room A', capacity: 12, creator: 'testUserId' },
+            { id: 'room2', name: 'Room B', capacity: 22, creator: 'testUserId' }
         ];
 
         roomService.getAllRooms.mockResolvedValue(mockRooms);
+
         await roomController.getAllRooms(req, res);
+
         expect(res.statusCode).toBe(200);
         expect(res.data).toEqual(mockRooms);
-      
     });
 
-    test('get room by id have to return status with 200', async () => {
-        const mockRoom = { id: 'room1', name: 'Inception', capacity: 22 };
-        
+    test('getRoomById should return status 200 and room data', async () => {
+        const mockRoom = { id: 'room1', name: 'Room A', capacity: 22 };
         roomService.getRoomById.mockResolvedValue(mockRoom);
 
+        await roomController.getRoomById(req, res);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual(mockRoom);
+    });
+
+    test('updateRoom should return status 200 and updated room data', async () => {
+        const mockRoom = { id: 'room1', name: 'Updated Room', capacity: 30 };
+        roomService.updateRoom.mockResolvedValue(mockRoom);
+        req.params.id = 'room1';
+        req.body = { name: "Updated Room", capacity: 30 };
+
+        await roomController.updateRoom(req, res);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual(mockRoom);
+    });
+
+    test('deleteRoom should return status 200 and success message', async () => {
+        const successMessage = { msg: 'Room deleted successfully' };
+        roomService.deleteRoom.mockResolvedValue(successMessage);
+        req.params.id = 'room1';
+
+        await roomController.deleteRoom(req, res);
+
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual(successMessage);
+    });
+
+    // Error handling tests
+    test('createRoom should return status 400 for validation errors', async () => {
+        const errorMessage = 'Room name is required';
+        roomService.createRoom.mockRejectedValue(new Error(errorMessage));
+
+        await roomController.createRoom(req, res);
+
+        expect(res.statusCode).toBe(400);
+        expect(res.data).toEqual(errorMessage);
+    });
+
+    test('getRoomById should return status 404 when room is not found', async () => {
+        const errorMessage = 'Room not found';
+        roomService.getRoomById.mockRejectedValue(new Error(errorMessage));
 
         await roomController.getRoomById(req, res);
-        expect(res.statusCode).toBe(200);
-        expect(res.data).toEqual(mockRoom);
-      
+
+        expect(res.statusCode).toBe(500);
+        expect(res.data).toEqual({ msg: errorMessage });
     });
 
-    test('updateroom must return status with 200', async () => {
-        const mockRoom = { id: 'room1', name: 'Inception', capacity: 22 };
-        
-        roomService.updateRoom.mockResolvedValue(mockRoom);
-        req.params.roomId = 'room1';
-        req.body = { title: "yeah bro" };
-        await roomController.updateRoom(req, res);
-        expect(res.statusCode).toBe(200);
-        expect(res.data).toEqual(mockRoom);
+    test('deleteRoom should return status 404 when room is not found', async () => {
+        const errorMessage = 'Room not found or you are not the creator';
+        roomService.deleteRoom.mockRejectedValue(new Error(errorMessage));
 
-    });
-
-    test('delete room must return a status of 200', async () => {
-        roomService.deleteRoom.mockResolvedValue({ msg: 'Room deleted successfully' });
-        req.params.roomId = 'room1';
         await roomController.deleteRoom(req, res);
-        expect(res.statusCode).toBe(200);
-        expect(res.data).toEqual({ msg: 'Room deleted successfully' });
 
-    })
-    
-    
-    
-    
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        expect(res.statusCode).toBe(500);
+        expect(res.data).toEqual({ msg: errorMessage });
+    });
 });
