@@ -56,6 +56,14 @@ exports.banUser = async (id) => {
   return updatedUser;
 };
 
+exports.UnbanUser = async (id) => {
+  const updatedUser = await User.findByIdAndUpdate(id, { banned: false }, { new: true });
+  if (updatedUser) {
+    await mailer.sendUnbanNotification(updatedUser);
+  }
+  return updatedUser;
+};
+
 exports.getUserById = async (id) => {
   const user = await User.findById(id);
   return user;
