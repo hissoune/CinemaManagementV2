@@ -3,7 +3,7 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const upload = require('../midlwares/multerSetup');
 
-router.post('/login', authController.login);
+router.post('/login',upload.fields([{ name: 'image', maxCount: 1 }]), authController.login);
 router.post('/register',upload.fields([{ name: 'image', maxCount: 1 }]), authController.register);
 router.get('/profile', authController.profile);
 router.put('/profile/favorites/:movieId', authController.favorites);
