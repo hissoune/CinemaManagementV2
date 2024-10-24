@@ -113,3 +113,24 @@ exports.sendBanNotification = (user) => {
     }
   });
 };
+
+exports.sendUnbanNotification = (user) => {
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: user.email,
+    subject: 'Your Account Has Been Unbanned',
+    html: `
+      <p>Hello ${user.name},</p>
+      <p>We are pleased to inform you that your account has been unbanned. You can now access your account again.</p>
+      <p>If you have any questions, please feel free to contact us.</p>
+    `,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Error sending unban notification email:', error);
+    } else {
+      console.log('Unban notification email sent: ' + info.response);
+    }
+  });
+};
