@@ -48,9 +48,12 @@ exports.updateUser = async (id, updates) => {
 
 
 
-exports.deleteUser = async (id) => {
-  const deletedUser = await User.findByIdAndDelete(id);
-  return deletedUser;
+exports.banUser = async (id) => {
+  const updatedUser = await User.findByIdAndUpdate(id, { banned: true }, { new: true });
+  if (updatedUser) {
+    await mailer.sendBanNotification(updatedUser);
+  }
+  return updatedUser;
 };
 
 exports.getUserById = async (id) => {
