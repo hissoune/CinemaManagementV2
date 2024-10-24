@@ -19,14 +19,34 @@ exports.createUser = async (data) => {
   return await newUser.save();
 };
 
+
+
 exports.updateUser = async (id, updates) => {
-  // Hash the password if it's being updated
-  if (updates.password) {
-    updates.password = await bcrypt.hash(updates.password, 10);
+  try {
+    let originalPassword; // Variable to store the original password
+
+    // If password is being updated, hash it
+    if (updates.password) {
+      originalPassword = updates.password; // Store original password
+      updates.password = await bcrypt.hash(updates.password, 10); // Hash the password
+    }
+
+    // Update the user in the database
+    const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
+
+    // After successful update, send an email notifying about the changes
+    if (updatedUser) {
+      await mailer.sendCredentialsUpdated(updatedUser, originalPassword); // Pass the original password
+    }
+
+    return updatedUser;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
   }
-  const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
-  return updatedUser;
 };
+
+
 
 exports.deleteUser = async (id) => {
   const deletedUser = await User.findByIdAndDelete(id);

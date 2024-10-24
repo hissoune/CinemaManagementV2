@@ -5,7 +5,7 @@ const upload = require('../midlwares/multerSetup');
 
 router.post('/',upload.fields([{ name: 'image', maxCount: 1 }]), adminController.createUser);
 router.get('/', adminController.getAllUsers);
-router.put('/update/:id',upload.fields([{ name: 'image', maxCount: 1 }]), adminController.getAllUsers);
+router.put('/update/:id',upload.fields([{ name: 'image', maxCount: 1 }]), adminController.updateUser);
 router.get('/:id', adminController.getUserById);
 router.delete('/delete/:id', adminController.deleteUser);
 

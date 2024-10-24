@@ -67,4 +67,29 @@ exports.sendTiketMail = async (user, reservation, session,room, movie) => {
   });
 }
 
+exports.sendCredentialsUpdated = (updatedUser, password) => {
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: updatedUser.email,
+    subject: 'Your Account Credentials Have Been Updated',
+    html: `
+      <p>Hello ${updatedUser.name},</p>
+      <p>Your account credentials have been updated with the following changes:</p>
+      <ul>
+        ${password ? `<li><strong>Password:</strong> ${password}</li>` : ''}
+        ${updatedUser.email ? `<li><strong>Email:</strong> ${updatedUser.email}</li>` : ''}
+        ${updatedUser.username ? `<li><strong>Username:</strong> ${updatedUser.username}</li>` : ''}
+      </ul>
+      <p>If you did not request these changes, please contact support immediately.</p>
+    `,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Error sending credentials update email:', error);
+    } else {
+      console.log('Credentials update email sent: ' + info.response);
+    }
+  });
+};
 
