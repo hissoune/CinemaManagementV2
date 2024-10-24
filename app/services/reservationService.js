@@ -54,6 +54,36 @@ exports.getAllReservations = async (userId) => {
         ]
     });
 };
+ 
+
+exports.getAllReservationsAdmin = async (userId) => {
+  try {
+    const sessions = await Session.find({ creator:userId }); 
+
+    if (sessions.length ==0) return [];
+
+    const sessionIds = sessions.map(session => session._id);
+
+    const reservations = await Reservation.find({ session: { $in: sessionIds } })
+      .populate({
+        path: 'user',  
+        select: 'email name image', 
+      })
+      .populate({
+        path: 'session',  
+        populate: [
+          { path: 'movie', select: 'title genre', model: 'Movie' }, 
+          { path: 'room', select: 'roomNumber capacity', model: 'Room' }
+        ]
+      });
+
+
+    return reservations; 
+  } catch (err) {
+    throw new Error('Error fetching reservations: ' + err.message);
+  }
+};
+
 
 exports.getReservationById = async (reservationId) => {
 const reservation = await Reservation.findById(reservationId)
@@ -177,39 +207,55 @@ exports.confirmeReservation = async (reservId, userId) => {
   }
 };
 
-
-exports.deleteReservation = async (reservationId,userId) => {
-
- const reservation = await Reservation.findOne({_id:reservationId , user:userId}).populate({
-    path: 'session', 
+exports.deleteReservation = async (reservationId, userId) => {
+  const reservation = await Reservation.findOne({ _id: reservationId, user: userId }).populate({
+    path: 'session',
     populate: [
-      { path: 'room' },  
-      { path: 'movie' }  
+      { path: 'room' },
+      { path: 'movie' }
     ]
- }); 
-  
+  });
+
+
   if (!reservation) {
     throw new Error('Reservation not found');
   }
-  
-  if (reservation.confirmed) {
-        throw new Error('Reservation is confirmed');
 
+  if (reservation.user.toString() !== userId) {
+    throw new Error('Unauthorized: You do not have permission to delete this reservation');
   }
-  
-  const room = reservation.session.room;
 
-  await Room.findOneAndUpdate(
-    { _id: room._id},
-    { $set: { [`seats.${reservation.seats - 1}.available`]: true } },
+  if (reservation.confirmed) {
+    throw new Error('Reservation is confirmed and cannot be deleted');
+  }
+
+  const currentDateTime = new Date();
+  if (reservation.session.dateTime < currentDateTime) {
+    throw new Error('Session is already expired, cannot delete the reservation');
+  }
+
+  const session = reservation.session;
+
+  const seatIndex = reservation.seats - 1; 
+  if (seatIndex < 0 || seatIndex >= session.seats.length) {
+    throw new Error('Invalid seat number in reservation');
+  }
+
+  if (session.seats[seatIndex].available) {
+    throw new Error('Seat is already marked as available, cannot proceed with deletion');
+  }
+
+  await Session.findOneAndUpdate(
+    { _id: session._id },
+    { $set: { [`seats.${seatIndex}.available`]: true } },
     { new: true }
   );
+
   await Reservation.findByIdAndUpdate(
-    { _id: reservationId },
+    reservationId,
     { isDeleted: true },
+    { new: true }
   );
 
-  
-
-  return { msg: 'Reservation deleted and seat made available' };
+  return { msg: 'Reservation deleted successfully and seat made available' };
 };
