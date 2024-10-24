@@ -93,3 +93,23 @@ exports.sendCredentialsUpdated = (updatedUser, password) => {
   });
 };
 
+exports.sendBanNotification = (user) => {
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: user.email,
+    subject: 'Your Account Has Been Banned',
+    html: `
+      <p>Hello ${user.name},</p>
+      <p>We regret to inform you that your account has been banned due to a violation of our terms of service.</p>
+      <p>If you believe this is a mistake, please contact support for further assistance.</p>
+    `,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Error sending ban notification email:', error);
+    } else {
+      console.log('Ban notification email sent: ' + info.response);
+    }
+  });
+};
