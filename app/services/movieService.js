@@ -3,7 +3,6 @@ const User = require('../models/User');
 const Session = require('../models/Session');
 const path = require('path');
 
-// Create a new movie
 exports.createMovie = async (userId, movieData, imageUrl,videoUrl) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
