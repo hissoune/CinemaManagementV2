@@ -3,22 +3,19 @@ const sessionController = require('../controllers/sessionController');
 
 jest.mock('../services/sessionService');
 
-
-
-describe('session test', () => {
+describe('Session Controller Tests', () => {
     let req, res;
 
     beforeEach(() => {
         req = {
             user: { id: 'userTest' },
             body: {
-                movie: 'dsfghjfdrsezzeqruj',
-                room: 'dfghfjkljjhgdfsqsdfg',
-                dateTime: '12-02-2000',
-                price: 222
+                movie: 'movieId123',
+                room: 'roomId123',
+                dateTime: '2023-12-01T19:00:00Z',
+                price: 222,
             },
-            params: { sessionId: 'sessionId' }
-
+            params: { id: 'sessionId123' }
         };
 
         res = {
@@ -30,66 +27,79 @@ describe('session test', () => {
             json(data) {
                 this.data = data;
             },
-        }
+        };
     });
 
-
-    test('create session must return a status of 201', async () => {
-        const mocksession = { id: 'session1', movie: 'dsfghjfdrsezzeqruj', room: 'dfghfjkljjhgdfsqsdfg', dateTime: '12-02-2000', price: 222 };
-
-        sessionService.createSession.mockResolvedValue(mocksession);
+    test('createSession should return status 201 and new session data', async () => {
+        const mockSession = { id: 'session1', ...req.body };
+        sessionService.createSession.mockResolvedValue(mockSession);
 
         await sessionController.createSession(req, res);
+
         expect(res.statusCode).toBe(201);
-        expect(res.data).toEqual(mocksession);
-
+        expect(res.data).toEqual(mockSession);
     });
-    
 
-    test('get all sessions must return a status code with 200', async () => {
-        const mokServices = [
-            { id: 'session1', movie: 'dsfghjfdrsezzeqruj', room: 'dfghfjkljjhgdfsqsdfg', dateTime: '12-02-2000', price: 222 },
-            { id: 'session2', movie: 'dsfghjfdrsezzeqruj', room: 'dfghfjkljjhgdfsqsdfg', dateTime: '12-02-2000', price: 222 },
+    test('getAllSessions should return status 200 and all sessions', async () => {
+        const mockSessions = [
+            { id: 'session1', ...req.body },
+            { id: 'session2', ...req.body },
         ];
-
-        sessionService.getAllSessions.mockResolvedValue(mokServices);
+        sessionService.getAllSessions.mockResolvedValue(mockSessions);
 
         await sessionController.getAllSessions(req, res);
+
         expect(res.statusCode).toBe(200);
-        expect(res.data).toEqual(mokServices);
-
-
+        expect(res.data).toEqual(mockSessions);
     });
-    test('get one session must return a statuscode with 200 ', async () => {
-        const mocksession = { id: 'session1', movie: 'dsfghjfdrsezzeqruj', room: 'dfghfjkljjhgdfsqsdfg', dateTime: '12-02-2000', price: 222 };
 
-        sessionService.getSessionById.mockResolvedValue(mocksession);
+    test('getSessionById should return status 200 and session data', async () => {
+        const mockSession = { id: 'session1', ...req.body };
+        sessionService.getSessionById.mockResolvedValue(mockSession);
 
         await sessionController.getSessionById(req, res);
-        expect(res.statusCode).toBe(200);
-        expect(res.data).toEqual(mocksession);
-    });
-    test('update session must return a status code  with 200', async () => {
-        const mocksession = { id: 'session1', movie: 'dsfghjfdrsezzeqruj', room: 'dfghfjkljjhgdfsqsdfg', dateTime: '12-02-2000', price: 222 };
-        sessionService.updateSession.mockResolvedValue(mocksession);
 
-        req.params.sessionId = 'sessionId';
-        req.body = { price: 322 };
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual(mockSession);
+    });
+
+    test('updateSession should return status 200 and updated session data', async () => {
+        const mockSession = { id: 'session1', ...req.body };
+        sessionService.updateSession.mockResolvedValue(mockSession);
+
         await sessionController.updateSession(req, res);
+
         expect(res.statusCode).toBe(200);
-        expect(res.data).toEqual(mocksession)
-
+        expect(res.data).toEqual(mockSession);
     });
-    
-    test('delete session must return a status code with 200 ', async() => {
-        sessionService.deleteSession.mockResolvedValue({ msg: 'Session deleted successfully' });
-        req.params.sessionId = 'sessionId';
+
+    test('deleteSession should return status 200 and success message', async () => {
+        const successMessage = { msg: 'Session deleted successfully' };
+        sessionService.deleteSession.mockResolvedValue(successMessage);
+
         await sessionController.deleteSession(req, res);
-          expect(res.statusCode).toBe(200);
-        expect(res.data).toEqual({ msg: 'Session deleted successfully' });
 
+        expect(res.statusCode).toBe(200);
+        expect(res.data).toEqual(successMessage);
+    });
 
-    })
-    
-    
+    test('createSession should return status 400 for validation errors', async () => {
+        const errorMessage = 'Movie ID is required';
+        sessionService.createSession.mockRejectedValue(new Error(errorMessage));
+
+        await sessionController.createSession(req, res);
+
+        expect(res.statusCode).toBe(400);
+        expect(res.data).toEqual({ error: errorMessage });
+    });
+
+    test('getSessionById should handle session not found error', async () => {
+        const errorMessage = 'Session not found';
+        sessionService.getSessionById.mockRejectedValue(new Error(errorMessage));
+
+        await sessionController.getSessionById(req, res);
+
+        expect(res.statusCode).toBe(500);
+        expect(res.data).toEqual({ msg: errorMessage });
+    });
 });
