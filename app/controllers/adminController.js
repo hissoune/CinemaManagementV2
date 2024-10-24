@@ -96,10 +96,7 @@ exports.UnbanUser = async (req, res) => {
   }
 };
 
-exports.getUserById = async (id) => {
-  const user = await User.findById(id);
-  return user;
-};
+
 
 exports.getAllAdmins = async (req, res) => {
   try {
