@@ -52,6 +52,7 @@ exports.updateReservation = async (req, res) => {
 exports.confirmeReservation = async (req, res) => {
   const userId = req.user.id;
   const reservId = req.params.id;
+  
   try {
           const result = await reservationService.confirmeReservation(reservId,userId);
     res.status(200).json(result);
