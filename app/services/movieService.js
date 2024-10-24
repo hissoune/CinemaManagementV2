@@ -151,7 +151,7 @@ exports.getmovieRelatedPublicById = async (movieId) => {
         { genre: { $in: genre } } 
     ],
     _id: { $ne: movieId } 
-  }).limit(5); 
+  }); 
 
   return relatedMovies;
 };
