@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const reservationController = require('../controllers/reservationController');
+const upload = require('../midlwares/multerSetup');
 
 
-router.post('/', reservationController.createReservation);
+router.post('/',upload.fields([{ name: 'image', maxCount: 1 }]), reservationController.createReservation);
 
 router.get('/', reservationController.getAllReservations);
 
