@@ -13,7 +13,7 @@ router.put('/rating',rating );
 router.get('/movies/:id', getMovieById);
 router.get('/relatedMovies/:id', getmovieRelatedPublicById);
 
-router.put('/movies/update/:id',upload.single('posterImage'),   updateMovie);
+router.put('/movies/update/:id',upload.fields([{ name: 'imageUrl', maxCount: 1 }, { name: 'videoUrl', maxCount: 1 }]),   updateMovie);
 
 router.delete('/movies/delete/:id',  deleteMovie);
 
