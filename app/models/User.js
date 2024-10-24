@@ -26,7 +26,11 @@ const UserSchema = new mongoose.Schema({
   favorites: [{
     type: mongoose.Schema.ObjectId,
     ref: 'Movie', 
-  }]
+  }],
+  banned: {
+    type: Boolean,
+    default: false, 
+  }
 }, { timestamps: true });
 
 UserSchema.pre('save', async function (next) {
