@@ -3,7 +3,8 @@ const Session = require('../models/Session');
 const Room = require('../models/Room');
 const User = require('../models/User');
 const mailer = require('../utils/mailer');
-exports.createReservation = async (userId, sessionId, seat) => {
+
+exports.createReservation = async (userId, sessionId, seatIndex) => {
   const userExists = await User.findById(userId);
   if (!userExists) {
     throw new Error('User not found');
@@ -14,31 +15,34 @@ exports.createReservation = async (userId, sessionId, seat) => {
     throw new Error('Session not found');
   }
 
-  const room = sessionExists.room;
+  const session = sessionExists;
 
-  const movie = sessionExists.movie;
+  if (!session.seats[seatIndex] || !session.seats[seatIndex].available) {
+    throw new Error('This seat is already reserved or does not exist');
+  }
 
   const oldReservations = await Reservation.find({ session: sessionId });
-
   oldReservations.forEach(reservation => {
-    if (reservation.seats === room.seats[seat-1].number) {
+    if (session.seats.includes(reservation.seats)) {
       throw new Error('This seat is already reserved');
     }
   });
 
-   await Room.findOneAndUpdate(
-    { _id: room._id, [`seats.${seat - 1}.number`]: seat },
-    { $set: { [`seats.${seat - 1}.available`]: false } },
-    { new: true }
-  );
+  session.seats[seatIndex].available = false;
+  
+  await session.save();
+
   const newReservation = new Reservation({
     user: userId,
     session: sessionId,
-    seats: seat,
+    seats: session.seats[seatIndex].number,
   });
 
-  return await newReservation.save();
+  await newReservation.save();
+ return session;
+
 };
+
 
 exports.getAllReservations = async (userId) => {
   return await Reservation.find({user:userId}).populate('user') 
