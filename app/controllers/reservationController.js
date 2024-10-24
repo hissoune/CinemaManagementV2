@@ -25,6 +25,17 @@ exports.getAllReservations = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+ 
+exports.getAllReservationsAdmin = async (req, res) => {
+  const userId = req.user.id;
+  try {
+
+    const reservations = await reservationService.getAllReservationsAdmin(userId);
+    res.status(200).json(reservations);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
 
 exports.getReservationById = async (req, res) => {
   try {
