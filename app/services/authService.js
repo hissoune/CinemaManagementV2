@@ -85,12 +85,11 @@ exports.requestPasswordReset = async (email) => {
   }
 
   const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '15m' });
-  const resetUrl = `http://localhost:3000/api/reset-password-fromemail/${resetToken}`;
+  const resetUrl = `http://localhost:5173/reset-password-fromemail/${resetToken}`;
   
   await mailer.sendRessetPass(email, resetUrl);
 };
 
-// Reset Password Service
 exports.resetPassword = async (token, newPassword) => {
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
   const userId = decoded.id;
@@ -116,8 +115,10 @@ exports.Profile = async (token) => {
    const decoded = jwt.verify(token, process.env.JWT_SECRET);
   const userId = decoded.user.id;
 
-  const user = await User.findById(userId);
-  
+  const user = await User.findById(userId).populate({
+    path: 'favorites',
+    model: 'Movie'  // Ensures it looks up the Movie collection
+});  
 
   return user;
 }
