@@ -69,9 +69,18 @@ exports.updateUser = async (req, res) => {
 
 
 
-exports.deleteUser = async (id) => {
-  const deletedUser = await User.findByIdAndDelete(id);
-  return deletedUser;
+exports.banUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const updatedUser = await adminService.banUser(userId);
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
 exports.getUserById = async (id) => {
