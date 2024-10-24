@@ -69,7 +69,11 @@ exports.getUserById = async (id) => {
   return user;
 };
 
-exports.getAllUsers = async () => {
-  const users = await User.find({role:"admin"});
-  return users;
+exports.getAllAdmins = async (authenticatedUserId) => {
+  const admins = await User.find({
+    role: 'admin',
+    _id: { $ne: authenticatedUserId } 
+  });
+  return admins;
 };
+
