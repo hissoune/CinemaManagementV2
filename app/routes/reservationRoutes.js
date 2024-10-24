@@ -7,6 +7,7 @@ const upload = require('../midlwares/multerSetup');
 router.post('/',upload.fields([{ name: 'image', maxCount: 1 }]), reservationController.createReservation);
 
 router.get('/', reservationController.getAllReservations);
+router.get('/admin', reservationController.getAllReservationsAdmin);
 
 router.get('/:id', reservationController.getReservationById);
 
