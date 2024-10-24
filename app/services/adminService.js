@@ -3,13 +3,14 @@ const bcrypt = require('bcryptjs');
 const mailer = require('../utils/mailer');
 
 exports.createUser = async (data) => {
-  const { name, email, password, role } = data;
+  const { name, email, password, role,image } = data;
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = new User({
     name,
     email,
+    image,
     password: hashedPassword,
     role,
   });
