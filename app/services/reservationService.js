@@ -128,33 +128,55 @@ exports.updateReservation = async (reservationId,userId,seat) => {
 
   return updatedReservation;
 };
-
-
 exports.confirmeReservation = async (reservId, userId) => {
-  const userExists = await User.findById(userId);
-  if (!userExists) {
-    throw new Error('User not found');
+  try {
+    const userExists = await User.findById(userId);
+    if (!userExists) {
+      throw new Error('User not found');
+    }
+
+    const reservation = await Reservation.findOne({ _id: reservId, user: userId }).populate({
+      path: 'session',
+      populate: [
+        { path: 'room' },
+        { path: 'movie' },
+      ],
+    });
+
+    if (!reservation) {
+      throw new Error('Reservation not found');
+    }
+
+    if (reservation.confirmed) {
+      throw new Error('Reservation is already confirmed');
+    }
+
+   await Reservation.findByIdAndUpdate(
+      reservId,
+      { confirmed: true },
+      { new: true }
+    );
+    const confirmedReservation = await Reservation.findById(reservId).populate({
+      path: 'session',
+      populate: [
+        { path: 'room' },
+        { path: 'movie' },
+      ],
+    });
+    const session = confirmedReservation.session;
+    const room = session.room;
+    const movie = session.movie;
+
+    await mailer.sendTiketMail(userExists, confirmedReservation, session, room, movie);
+
+    return confirmedReservation;
+
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    throw new Error('Could not confirm reservation');
   }
-   const reserv = await Reservation.findOne({_id: reservId ,user:userId }).populate({
-    path: 'session', 
-    populate: [
-      { path: 'room' },  
-      { path: 'movie' }  
-    ]
-   });
-   const session = reserv.session;
-  const room = reserv.session.room;
-  const movie = reserv.session.movie;
+};
 
-  const confirmedReservation = await Reservation.findByIdAndUpdate(
-  { _id: reservId },
-  {confirmed: true},
-  {new: true},
-)
-      await mailer.sendTiketMail(userExists,confirmedReservation, session,room, movie); 
-  return  confirmedReservation;
-
-}
 
 exports.deleteReservation = async (reservationId,userId) => {
 
