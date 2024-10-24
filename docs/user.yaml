@@ -201,7 +201,31 @@ paths:
                 items:
                   $ref: "#/components/schemas/Movie"
       security:
-        - BearerAuth: []  # Requires authentication            
+        - BearerAuth: []  # Requires authentication             
+
+  "/movies/{id}":
+    get:
+      tags:
+        - Movies
+      summary: Get a movie by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the movie
+          schema:
+            type: string
+      responses:
+        200:
+          description: Movie details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Movie"
+        404:
+          description: Movie not found
+      security:
+        - BearerAuth: []  # Requires authentication 
 
   "/rooms/":
     get:
@@ -220,6 +244,30 @@ paths:
       security:
         - BearerAuth: []  # Requires authentication                  
 
+  "/rooms/{id}":
+    get:
+      tags:
+        - Rooms
+      summary: Get a room by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the room
+          schema:
+            type: string
+      responses:
+        200:
+          description: Room details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        404:
+          description: Room not found
+      security:
+        - BearerAuth: []  # Requires authentication 
+
   "/sessions/":
     get:
       tags:
@@ -237,6 +285,30 @@ paths:
       security:
         - BearerAuth: []  # Requires authentication                  
 
+  "/sessions/{id}":
+    get:
+      tags:
+        - Sessions
+      summary: Get a session by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the session
+          schema:
+            type: string
+      responses:
+        200:
+          description: Session details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        404:
+          description: Session not found
+      security:
+        - BearerAuth: []  # Requires authentication 
+
   "/reservations/":
     post:
       tags:
@@ -248,7 +320,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Reservation"
-             
       responses:
         201:
           description: Reservation made successfully
@@ -260,3 +331,53 @@ paths:
           description: Invalid reservation data
       security:
         - BearerAuth: []  # Requires authentication
+
+  "/reservations/{id}":
+    get:
+      tags:
+        - Reservations
+      summary: Get a reservation by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the reservation
+          schema:
+            type: string
+      responses:
+        200:
+          description: Reservation details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationResponse"
+        404:
+          description: Reservation not found
+      security:
+        - BearerAuth: []  # Requires authentication 
+
+    delete:
+      tags:
+        - Reservations
+      summary: Delete a reservation by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the reservation
+          schema:
+            type: string
+      responses:
+        200:
+          description: Reservation deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        404:
+          description: Reservation not found
+      security:
+        - BearerAuth: []  # Requires authentication 
