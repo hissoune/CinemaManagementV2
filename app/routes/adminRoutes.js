@@ -8,5 +8,6 @@ router.get('/', adminController.getAllUsers);
 router.put('/update/:id',upload.fields([{ name: 'image', maxCount: 1 }]), adminController.updateUser);
 router.get('/:id', adminController.getUserById);
 router.delete('/banUser/:id', adminController.banUser);
+router.delete('/UnbanUser/:id', adminController.UnbanUser);
 
 module.exports = router;
