@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Blacklist = require('../models/Blacklist'); 
-const publicRoutes = ['/api/auth/login', '/api/auth/register','api/sessions/public','api/public','/uploads','/api-docs'];
+const publicRoutes = ['/api/auth/login', '/api/auth/register', '/api/auth/reset-password','api/sessions/public','api/public','/uploads','/api-docs'];
 
 const verifyToken = async (req, res, next) => {
   
@@ -40,6 +40,7 @@ const verifyToken = async (req, res, next) => {
 
       case req.path.startsWith('/api/admins'):
       case req.path.startsWith('/api/movies'):
+      case req.path.startsWith('/api/reservations/admin'):
         
       case req.path.startsWith('/api/rooms'):
       case req.path.startsWith('/api/sessions'):
