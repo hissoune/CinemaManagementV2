@@ -1,4 +1,3 @@
-const User = require('../models/User');
 const adminService = require('../services/adminService'); 
 const { uploadToMinIO } = require('../services/uploadService');
 
@@ -102,7 +101,14 @@ exports.getUserById = async (id) => {
   return user;
 };
 
-exports.getAllUsers = async () => {
-  const users = await User.find({ role: "admin" }); // Get only admins
-  return users;
+exports.getAllAdmins = async (req, res) => {
+  try {
+    const authenticatedUserId = req.user.id; 
+    const admins = await adminService.getAllAdmins(authenticatedUserId);
+    
+    
+    res.status(200).json(admins);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
