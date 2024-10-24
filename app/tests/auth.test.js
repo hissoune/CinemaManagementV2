@@ -4,17 +4,18 @@ const User = require('../models/User');
 const Blacklist = require('../models/Blacklist');
 const mailer = require('../utils/mailer');
 const authService = require('../services/authService');
+const { uploadToMinIO } = require('../services/uploadService');
 
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
-jest.mock('../models/User');  
+jest.mock('../models/User');
 jest.mock('../models/Blacklist');
 jest.mock('../utils/mailer');
+jest.mock('../services/uploadService'); 
 
 describe('Auth Service', () => {
-  
-  describe('login', () => {
 
+  describe('login', () => {
     test('should return a JWT token if credentials are correct', async () => {
       const mockUser = { _id: 'testUserId', email: 'test@example.com', password: 'hashedpassword', role: 'admin' };
       User.findOne.mockResolvedValue(mockUser);
@@ -22,7 +23,7 @@ describe('Auth Service', () => {
       jwt.sign.mockReturnValue('testtoken');
 
       const result = await authService.login('test@example.com', 'password123');
-      expect(result).toBe('testtoken');
+      expect(result).toEqual({ token: 'testtoken', user: mockUser });
       expect(User.findOne).toHaveBeenCalledWith({ email: 'test@example.com' });
       expect(bcrypt.compare).toHaveBeenCalledWith('password123', 'hashedpassword');
       expect(jwt.sign).toHaveBeenCalledWith({ user: { id: mockUser._id, role: mockUser.role } }, process.env.JWT_SECRET, { expiresIn: '1000h' });
@@ -44,21 +45,32 @@ describe('Auth Service', () => {
 
   describe('register', () => {
 
-    test('should create a new user', async () => {
-      const mockUser = { _id: 'testUserId', name: 'Test', email: 'test@example.com' };
-      const newUser = { name: 'Test', email: 'test@example.com', password: 'password123', role: 'user' };
+    test('should create a new user with hashed password and image', async () => {
+      const mockUser = { _id: 'testUserId', name: 'Test', email: 'test@example.com', image: 'image-url' };
+      const newUser = { name: 'Test', email: 'test@example.com', password: 'password123', role: 'user', image: 'image-url' };
 
+      User.findOne.mockResolvedValue(null); 
+      bcrypt.hash.mockResolvedValue('hashedpassword');
       User.prototype.save.mockResolvedValue(mockUser);
+      uploadToMinIO.mockResolvedValue('image-url'); 
 
       const result = await authService.register(newUser);
-      expect(result).toEqual(mockUser);
+      expect(result).toEqual({ token: expect.any(String), user: mockUser });
+      expect(User.findOne).toHaveBeenCalledWith({ email: newUser.email });
+      expect(bcrypt.hash).toHaveBeenCalledWith(newUser.password, 10);
       expect(User.prototype.save).toHaveBeenCalled();
+      expect(uploadToMinIO).toHaveBeenCalled(); 
     });
 
+    test('should throw an error if user already exists', async () => {
+      const mockUser = { email: 'test@example.com' };
+      User.findOne.mockResolvedValue(mockUser);
+
+      await expect(authService.register({ email: 'test@example.com' })).rejects.toThrow('User already exists');
+    });
   });
 
   describe('logout', () => {
-    
     test('should add token to the blacklist', async () => {
       const token = 'testtoken';
       jwt.decode.mockReturnValue({ exp: Math.floor(Date.now() / 1000) + 3600 });
@@ -115,6 +127,51 @@ describe('Auth Service', () => {
       User.findByIdAndUpdate.mockResolvedValue(null);
 
       await expect(authService.resetPassword('resettoken', 'newpassword123')).rejects.toThrow('User not found');
+    });
+  });
+
+  describe('favorites', () => {
+    test('should add or remove movie from user favorites', async () => {
+      const mockUser = { _id: 'testUserId', favorites: ['movieId1'] };
+      User.findById.mockResolvedValue(mockUser);
+      User.findByIdAndUpdate.mockResolvedValue(mockUser);
+
+      await authService.favorites('movieId2', 'testUserId'); 
+      expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+        'testUserId',
+        { $addToSet: { favorites: 'movieId2' } },
+        { new: true, runValidators: false }
+      );
+
+      await authService.favorites('movieId1', 'testUserId'); 
+      expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
+        'testUserId',
+        { $pull: { favorites: 'movieId1' } },
+        { new: true, runValidators: false }
+      );
+    });
+
+    test('should throw an error if user not found', async () => {
+      User.findById.mockResolvedValue(null);
+      await expect(authService.favorites('movieId', 'testUserId')).rejects.toThrow('User not found');
+    });
+  });
+
+  describe('updateUser', () => {
+    test('should update user data including image', async () => {
+      const mockUser = { _id: 'testUserId', name: 'Updated Name' };
+      User.findByIdAndUpdate.mockResolvedValue(mockUser);
+      uploadToMinIO.mockResolvedValue('new-image-url'); 
+
+      const result = await authService.updateUser('testUserId', { name: 'Updated Name' }, 'image-file');
+      expect(uploadToMinIO).toHaveBeenCalledWith('image-file');
+      expect(User.findByIdAndUpdate).toHaveBeenCalledWith('testUserId', { name: 'Updated Name', image: 'new-image-url' }, { new: true });
+      expect(result).toEqual(mockUser);
+    });
+
+    test('should throw an error if user not found', async () => {
+      User.findByIdAndUpdate.mockResolvedValue(null);
+      await expect(authService.updateUser('testUserId', { name: 'Updated Name' })).rejects.toThrow('User not found');
     });
   });
 });
