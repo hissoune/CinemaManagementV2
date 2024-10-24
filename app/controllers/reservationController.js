@@ -1,10 +1,10 @@
 const reservationService = require('../services/reservationService');
 const reservationValidation = require('../utils/validations/reservationValidation');
 exports.createReservation = async (req, res) => {
- const { error } = reservationValidation.validateReservation(req.body);
-  if (error) {
-   return  res.status(400).json(error.details[0].message)
-  }
+//  const { error } = reservationValidation.validateReservation(req.body);
+//   if (error) {
+//    return  res.status(400).json(error.details[0].message)
+//   }
   try {
     const userId = req.user.id;
     const { session, seats } = req.body;
