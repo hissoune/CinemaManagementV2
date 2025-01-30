@@ -68,7 +68,6 @@ exports.getSessionById = async (sessionId) => {
 };
 
 exports.updateSession = async (sessionId, movieId, roomId, dateTime, price, userId) => {
-  // Check if the session exists and if the current user is the creator
   const session = await Session.findById(sessionId);
   if (!session) {
     throw new Error('Session not found');
