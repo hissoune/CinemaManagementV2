@@ -17,10 +17,11 @@ exports.createMovie = async (req, res) => {
     const userId = req.user.id;
 
     const videoFile = req.files.videoUrl; 
-    const videoUrl = await uploadToMinIO(videoFile[0]); 
+
+    const videoUrl = await uploadToMinIO(videoFile[0], 'video'); 
 
     const imageFile = req.files.imageUrl; 
-    const imageUrl = await uploadToMinIO(imageFile[0]);
+    const imageUrl = await uploadToMinIO(imageFile[0], 'image');
 
    
     const savedMovie = await movieService.createMovie(userId, req.body, imageUrl,videoUrl);
