@@ -107,9 +107,11 @@ exports.favorites =async (req,res)=>{
  
   
   const movieId = req.params.movieId;
-  console.log(movieId);
+  console.log("hada mn lor ",movieId);
   
   const userId = req.user.id;
+  console.log(userId);
+  
   authService.favorites(movieId,userId)
   .then((user) => {
     res.status(200).json(user);
