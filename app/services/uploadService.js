@@ -2,17 +2,24 @@ const path = require('path');
 const minioClient = require('../config/minioConfig');
 const bucketName = 'videos';
 
-const uploadToMinIO = (file) => {
+const uploadToMinIO = (file, isAnX) => {
     return new Promise((resolve, reject) => {
       const filePath = file.path;
   
       const fileExtension = path.extname(file.originalname).toLowerCase();
-  
+      
       let uniqueFileName;
+      
+
   
-      if (file.mimetype.startsWith('image/')) {
+
+      if (file.mimetype.startsWith('image/') && isAnX == 'image' ) {
         uniqueFileName = `image_${Date.now()}${fileExtension}`;
-      } else if (file.mimetype.startsWith('video/')) {
+
+      } else if (file.mimetype.startsWith('video/') && isAnX == 'video' ) {
+       
+         
+
         uniqueFileName = `video_${Date.now()}${fileExtension}`;
       } else {
         return reject(new Error('Unsupported file type: ' + file.mimetype));
