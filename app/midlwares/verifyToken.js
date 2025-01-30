@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Blacklist = require('../models/Blacklist'); 
-const publicRoutes = ['/api/auth/login', '/api/auth/register', '/api/auth/reset-password','api/sessions/public','api/public','/uploads','/api-docs'];
+const publicRoutes = ['/api/auth/login', '/api/auth/register', '/api/auth/reset-password','api/sessions/public','/api/public/sessions','/api/public/movies','/uploads','/api-docs'];
 
 const verifyToken = async (req, res, next) => {
   
@@ -28,14 +28,15 @@ const verifyToken = async (req, res, next) => {
     // }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
     req.user = decoded.user; 
 
     switch (true) {
       case req.path.startsWith('/api/auth'):
-        if (token && !req.path.startsWith('/api/auth/logout')&&!req.path.startsWith('/api/auth/profile')) {
-          return res.status(302).json({ msg: 'You are already logged in. Please log out first.' });
+        // if (token && !req.path.startsWith('/api/auth/logout')&&!req.path.startsWith('/api/auth/profile')) {
+        //   return res.status(302).json({ msg: 'You are already logged in. Please log out first.' });
 
-        }
+        // }
         break;
 
       case req.path.startsWith('/api/admins'):
