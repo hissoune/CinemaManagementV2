@@ -30,7 +30,8 @@ const publicRoutes = require('./app/routes/publicRoutes')
 const commentsRoutes = require('./app/routes/commentRoute')
 const statiquesRoutes = require('./app/routes/statiqutiquesRoutes');
 
-app.use(verifyToken)
+app.use(verifyToken);
+
 app.use('/api/auth', authRoutes);
 
 app.use('/api-docs',swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -50,7 +51,7 @@ app.use('/api/sessions', sessionRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/statiques', statiquesRoutes);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
