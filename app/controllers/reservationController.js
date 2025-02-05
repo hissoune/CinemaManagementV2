@@ -7,8 +7,12 @@ exports.createReservation = async (req, res) => {
 //   }
   try {
     const userId = req.user.id;
+    
     const { session, seats } = req.body;
+    
     const newReservation = await reservationService.createReservation(userId, session, seats);
+   
+    
     res.status(201).json(newReservation);
   } catch (err) {
     res.status(500).json({ msg: err.message });
