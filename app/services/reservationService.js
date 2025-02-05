@@ -17,28 +17,29 @@ exports.createReservation = async (userId, sessionId, seatIndex) => {
 
   const session = sessionExists;
 
-  if (!session.seats[seatIndex] || !session.seats[seatIndex].available) {
+  if (!session.seats[seatIndex-1] || !session.seats[seatIndex-1].available) {
     throw new Error('This seat is already reserved or does not exist');
   }
 
   const oldReservations = await Reservation.find({ session: sessionId });
   oldReservations.forEach(reservation => {
-    if (session.seats.includes(reservation.seats)) {
+    if (session.seats.includes(reservation.seats-1)) {
       throw new Error('This seat is already reserved');
     }
   });
 
-  session.seats[seatIndex].available = false;
+  session.seats[seatIndex-1].available = false;
   
   await session.save();
 
   const newReservation = new Reservation({
     user: userId,
     session: sessionId,
-    seats: session.seats[seatIndex].number,
+    seats: session.seats[seatIndex-1].number,
   });
 
   await newReservation.save();
+  
  return session;
 
 };
