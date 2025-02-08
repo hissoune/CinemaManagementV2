@@ -19,5 +19,8 @@ const SubscriptionSchema = new mongoose.Schema({
     type: Date,
   }
 }, { timestamps: true });
-
+SubscriptionSchema.pre(/^find/,function(next){
+  this.find({ endDate: { $gt: Date.now() } });
+    next();
+})
 module.exports = mongoose.model('Subscription', SubscriptionSchema);
