@@ -127,6 +127,8 @@ exports.getmoviePublicById = async (req, res) => {
 
 exports.rating = async (req, res) => {
   const { movieId, rating } = req.body;
+  console.log({ movieId, rating });
+  
   const userId = req.user.id; 
 
   if (!rating || rating < 1 || rating > 10) {
