@@ -8,7 +8,7 @@ router.post('/movies/create',upload.fields([{ name: 'imageUrl', maxCount: 1 }, {
 
 
 router.get('/movies/', getMovies);
-router.put('/rating',rating );
+router.patch('/rating',rating );
 
 router.get('/movies/:id', getMovieById);
 router.get('/relatedMovies/:id', getmovieRelatedPublicById);
