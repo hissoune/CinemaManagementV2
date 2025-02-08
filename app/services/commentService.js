@@ -10,7 +10,10 @@ exports.createComment = async ({ movieId, userId, content }) => {
     });
 
     await newComment.save();
-    return newComment;
+    return newComment.populate({
+      path: 'user',
+      select: 'name email image'
+    });
   } catch (err) {
     throw new Error('Error creating comment: ' + err.message);
   }
@@ -20,9 +23,9 @@ exports.getCommentsByMovie = async (movieId) => {
   try {
     const comments = await Comment.find({ movie: movieId })
     .populate({
-        path: 'user',
-        select: 'name email image'
-      })
+      path: 'user',
+      select: 'name email image'
+    })
       .sort({ createdAt: -1 });
     
     return comments;
