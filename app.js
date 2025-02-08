@@ -29,7 +29,7 @@ const reservationRoutes = require('./app/routes/reservationRoutes');
 const publicRoutes = require('./app/routes/publicRoutes')
 const commentsRoutes = require('./app/routes/commentRoute')
 const statiquesRoutes = require('./app/routes/statiqutiquesRoutes');
-
+const subscriptioRoutes = require('./app/routes/subsribeRoutes')
 app.use(verifyToken);
 
 app.use('/api/auth', authRoutes);
@@ -50,7 +50,7 @@ app.use('/api/sessions', sessionRoutes);
 
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/statiques', statiquesRoutes);
-
+app.use('/api/subscriptions',subscriptioRoutes)
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
