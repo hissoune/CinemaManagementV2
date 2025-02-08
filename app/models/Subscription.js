@@ -8,7 +8,7 @@ const SubscriptionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['subscribed', 'basic'],
+    enum: ['Payed', 'basic'],
     required: true,
   },
   startDate: {
