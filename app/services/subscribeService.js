@@ -36,11 +36,7 @@ exports.createSubscription = async (data) => {
 // };
 
 exports.isSubscriped = async (userId)=>{
-   const subscription = Subscription.findOne({user:userId});
-   if (!subscription) {
-    return false
-
-   }
-   return true
+   const subscription = await Subscription.find({user:userId});
+   return subscription.length > 0;
 
 }

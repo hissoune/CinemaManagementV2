@@ -1,7 +1,9 @@
 const subscriptionService = require('../services/subscribeService');
 
 exports.createSubscription = async (req, res) => {
-    const {user,type} = req.body
+    const {type} = req.body
+
+    const user= req.user.id
   try {
     const subscription = await subscriptionService.createSubscription({user,type});
     res.status(201).json(subscription);
@@ -52,14 +54,11 @@ exports.isSubscriped = async (req,res)=>{
     const userId = req.user.id
     try {
         const isSubscripped =await  subscriptionService.isSubscriped(userId)
-        if (isSubscripped) {
-                    res.status(200).json({ message: 'the user is Subscripped ' });
+        
+  
+        res.status(200).json(isSubscripped);
 
-        }else{
-            res.status(200).json({ message: 'the user is Subscripped ' });
-
-        }
-
+       
     } catch (error) {
         res.status(500).json({ error: error.message });
 
